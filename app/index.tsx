@@ -2,28 +2,30 @@ import { getPackageApi } from '@/components/api/packageApi';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import './global.css';
+import { useGetPackageDataQuery } from '@/features/home/api/packageApi';
 
 type Package = {
   id: string;
   name: string;
-  // Add other fields if needed
 };
 export default function Index() {
-  const [packages, setPackages] = useState<Package[]>([]);
+  const { data: packages} = useGetPackageDataQuery();
+  // const [packages, setPackages] = useState<Package[]>([]);
 
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        const data = await getPackageApi();
-        setPackages(data);
-        console.log('Fetched packages:', data);
-      } catch (error) {
-        console.error('Error fetching packages:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPackages = async () => {
+  //     try {
+  //       const data = await getPackageApi();
+  //       setPackages(data);
+  //       console.log('Fetched packages:', data);
+  //     } catch (error) {
+  //       console.error('Error fetching packages:', error);
+  //     }
+  //   };
 
-    fetchPackages();
-  }, []);
+  //   fetchPackages();
+  // }, []);
+  
   return (
     <View className='flex-1 items-center justify-center'>
       {packages &&
