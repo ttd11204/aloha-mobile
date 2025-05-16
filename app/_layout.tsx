@@ -6,9 +6,7 @@ import './global.css';
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
       <Stack />
-      {/* </PersistGate> */}
     </Provider>
   );
 }
