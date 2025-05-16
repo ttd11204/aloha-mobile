@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "movie",
-    "slug": "movie",
+    "name": "aloha",
+    "slug": "aloha",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "movie",
+    "scheme": "aloha",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
