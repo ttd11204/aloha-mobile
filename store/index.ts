@@ -1,32 +1,32 @@
 // import { homeApi } from '@/features/home/api/HomeApi';
 import { packageApi } from '@/features/home/api/packageApi';
 import { homeSlice } from '@/features/home/slices/homeSlice';
-import { mmkvStorage } from '@/store/mmkvStorage';
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { persistReducer, persistStore } from 'redux-persist';
+// import { secureStore } from './secureStore.ts';
 
-const persistConfig = {
-  key: 'root',
-  storage: mmkvStorage,
-  whitelist: ['home'],
-};
+// const persistConfig = {
+//   key: 'root',
+//   storage: secureStore, // ✅ thay vì mmkvStorage
+//   whitelist: ['home'], // các slice cần persist
+// };
 
-const persistedReducer = persistReducer(persistConfig, homeSlice.reducer);
+// const persistedReducer = persistReducer(persistConfig, homeSlice.reducer);
 
 export const store = configureStore({
   reducer: {
     //reducers
-    home: persistedReducer,
+    home: homeSlice.reducer,
 
     //api
-    [homeApi.reducerPath]: homeApi.reducer,
+    // [homeApi.reducerPath]: homeApi.reducer,
     [packageApi.reducerPath]: packageApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // tránh lỗi serialize với MMKV
-    }).concat(homeApi.middleware),
+      serializableCheck: false,
+    }).concat(packageApi.middleware),
 });
 
 // export const persistor = persistStore(store);
