@@ -1,6 +1,9 @@
+
 import { HapticTab } from "@/components/HapticTab";
 import HomePage from "@/features/home/Home";
-import { MaterialIcons } from '@expo/vector-icons';
+import PrivacyPolicy from "@/features/privacy-policy/PrivacyPolicy";
+import QuestionAnswer from "@/features/QA/QuestionAnswer";
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Platform } from 'react-native';
@@ -34,17 +37,17 @@ import { Platform } from 'react-native';
                <Ionicons name="compass" size={24} color={color} />
              ),
            }}
-         />
+         /> */}
          <Tab.Screen
            name="PrivacyPolicy"
-           component={PrivacyPolicyScreen}
+           component={PrivacyPolicy}
            options={{
              title: "PrivacyPolicy",
              tabBarIcon: ({ color }) => (
                <MaterialIcons name="privacy-tip" size={24} color={color} />
              ),
            }}
-         /> */}
+         />
          <Tab.Screen
            name="index"
            component={HomePage}
@@ -55,17 +58,17 @@ import { Platform } from 'react-native';
              ),
            }}
          />
-         {/* <Tab.Screen
+         <Tab.Screen
            name="QA"
-           component={QAScreen}
+           component={QuestionAnswer}
            options={{
              title: "Q&A",
              tabBarIcon: ({ color }) => (
-               <AntDesign name="questioncircle" size={28} color={color} />
+               <AntDesign name="questioncircle" size={24} color={color} />
              ),
            }}
          />
-         <Tab.Screen
+         {/* <Tab.Screen
            name="Login"
            component={LoginScreen}
            options={{
