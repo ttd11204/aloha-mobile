@@ -1,0 +1,80 @@
+import { HapticTab } from "@/components/HapticTab";
+import HomePage from "@/features/home/Home";
+import { MaterialIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
+import { Platform } from 'react-native';
+
+   const Tab = createBottomTabNavigator();
+   const BLUE_TAB_COLOR = "#0095ff";
+   const ACTIVE_ICON_COLOR = "#ffff00";
+   const INACTIVE_ICON_COLOR = "#ffffff";
+
+   export default function TabLayout() {
+
+     return (
+       <Tab.Navigator
+         screenOptions={{
+           tabBarActiveTintColor: ACTIVE_ICON_COLOR,
+           tabBarInactiveTintColor: INACTIVE_ICON_COLOR,
+           headerShown: false,
+           tabBarButton: HapticTab,
+           tabBarStyle: {
+             backgroundColor: BLUE_TAB_COLOR,
+             ...(Platform.OS === "android" && { position: "absolute" }),
+           },
+         }}
+       >
+         {/* <Tab.Screen
+           name="SideQuest"
+           component={SideQuestScreen}
+           options={{
+             title: "SideQuest",
+             tabBarIcon: ({ color }) => (
+               <Ionicons name="compass" size={24} color={color} />
+             ),
+           }}
+         />
+         <Tab.Screen
+           name="PrivacyPolicy"
+           component={PrivacyPolicyScreen}
+           options={{
+             title: "PrivacyPolicy",
+             tabBarIcon: ({ color }) => (
+               <MaterialIcons name="privacy-tip" size={24} color={color} />
+             ),
+           }}
+         /> */}
+         <Tab.Screen
+           name="index"
+           component={HomePage}
+           options={{
+             title: "Home",
+             tabBarIcon: ({ color }) => (
+               <MaterialIcons name="home" size={24} color={color} />
+             ),
+           }}
+         />
+         {/* <Tab.Screen
+           name="QA"
+           component={QAScreen}
+           options={{
+             title: "Q&A",
+             tabBarIcon: ({ color }) => (
+               <AntDesign name="questioncircle" size={28} color={color} />
+             ),
+           }}
+         />
+         <Tab.Screen
+           name="Login"
+           component={LoginScreen}
+           options={{
+             title: "Login",
+             tabBarIcon: ({ color }) => (
+               <FontAwesome5 name="door-open" size={28} color={color} />
+             ),
+           }}
+         /> */}
+       </Tab.Navigator>
+     );
+   }
