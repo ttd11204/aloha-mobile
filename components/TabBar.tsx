@@ -1,9 +1,10 @@
 
 import { HapticTab } from "@/components/HapticTab";
+import LoginRegister from "@/features/auth/components/login-register/LoginRegister";
 import HomePage from "@/features/home/Home";
 import PrivacyPolicy from "@/features/privacy-policy/PrivacyPolicy";
 import QuestionAnswer from "@/features/QA/QuestionAnswer";
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Platform } from 'react-native';
@@ -68,16 +69,16 @@ import { Platform } from 'react-native';
              ),
            }}
          />
-         {/* <Tab.Screen
+         <Tab.Screen
            name="Login"
-           component={LoginScreen}
+           component={LoginRegister}
            options={{
              title: "Login",
              tabBarIcon: ({ color }) => (
                <FontAwesome5 name="door-open" size={28} color={color} />
              ),
            }}
-         /> */}
+         />
        </Tab.Navigator>
      );
    }
