@@ -1,4 +1,6 @@
 // import { homeApi } from '@/features/home/api/HomeApi';
+import { authApi } from '@/features/auth/api/authApi';
+import { authSlice } from '@/features/auth/slice/authSlice';
 import { packageApi } from '@/features/home/api/packageApi';
 import { homeSlice } from '@/features/home/slices/homeSlice';
 import { configureStore } from '@reduxjs/toolkit';
@@ -8,15 +10,17 @@ export const store = configureStore({
   reducer: {
     //reducers
     home: homeSlice.reducer,
+    auth: authSlice.reducer,
 
     //api
     // [homeApi.reducerPath]: homeApi.reducer,
     [packageApi.reducerPath]: packageApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(packageApi.middleware),
+    }).concat(packageApi.middleware, authApi.middleware),
 });
 
 setupListeners(store.dispatch);
