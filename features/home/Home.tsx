@@ -1,8 +1,8 @@
-import Icon from "@react-native-vector-icons/fontawesome";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Plane } from "lucide-react-native";
-import React from "react";
+import Icon from '@react-native-vector-icons/fontawesome';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Plane } from 'lucide-react-native';
+import React from 'react';
 import {
   Alert,
   FlatList,
@@ -13,48 +13,48 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import { useGetPackageDataQuery } from "./api/packageApi";
-import ImageSlider from "./components/HomeSlider";
-import PopularChallenges from "./components/PopularChallenges";
-import Testimonials from "./components/Testimonials";
-import NearbyEvents from "./components/event/Event";
-import AlohaRewards from "./components/reward/Reward";
-import NewsletterSubscription from "./components/subcriptions/Subcriptions";
-import { Package } from "./types";
+} from 'react-native';
+import { useGetPackageDataQuery } from './api/packageApi';
+import ImageSlider from './components/HomeSlider';
+import PopularChallenges from './components/PopularChallenges';
+import Testimonials from './components/Testimonials';
+import NearbyEvents from './components/event/Event';
+import AlohaRewards from './components/reward/Reward';
+import NewsletterSubscription from './components/subcriptions/Subcriptions';
+import { Package } from './types';
 
 const featuredDestinations = [
   {
-    name: "Hue Imperial City",
-    location: "Central Vietnam",
+    name: 'Hue Imperial City',
+    location: 'Central Vietnam',
     challenges: 5,
     rating: 4.9,
     isNew: true,
-    image: require("../../assets/Side_Image/hue.jpg") as ImageSourcePropType,
+    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: "Hanoi Old Quarter",
-    location: "Northern Vietnam",
+    name: 'Hanoi Old Quarter',
+    location: 'Northern Vietnam',
     challenges: 8,
     rating: 4.7,
     isNew: false,
-    image: require("../../assets/Side_Image/hue.jpg") as ImageSourcePropType,
+    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: "Da Nang Beach",
-    location: "Central Vietnam",
+    name: 'Da Nang Beach',
+    location: 'Central Vietnam',
     challenges: 3,
     rating: 4.6,
     isNew: true,
-    image: require("../../assets/Side_Image/hue.jpg") as ImageSourcePropType,
+    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: "Mekong Delta",
-    location: "Southern Vietnam",
+    name: 'Mekong Delta',
+    location: 'Southern Vietnam',
     challenges: 6,
     rating: 4.8,
     isNew: false,
-    image: require("../../assets/Side_Image/hue.jpg") as ImageSourcePropType,
+    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   // ... other destinations
 ];
@@ -89,14 +89,14 @@ export default function HomePage() {
     <TouchableOpacity
       style={styles.packageCard}
       onPress={() => {
-        console.log("Package ID:", item.id);
+        console.log('Package ID:', item.id);
         if (item.id === 1) {
-          console.log("Annual Payment");
+          console.log('Annual Payment');
           navigation.navigate('AnnualPayment');
         } else if (item.id === 2) {
-          console.log("Days Payment");
+          console.log('Days Payment');
           navigation.navigate('DaysPayment');
-        } 
+        }
         // else {
         //   navigation.navigate('PackageDetail', { id: item.id });
         // }
@@ -115,7 +115,7 @@ export default function HomePage() {
       {item.isNew && <Text style={styles.newTag}>New</Text>}
       <Text style={styles.destinationTitle}>{item.name}</Text>
       <Text style={styles.destinationMeta}>
-        <Icon name="map-marker" size={12} /> {item.location}
+        <Icon name='map-marker' size={12} /> {item.location}
       </Text>
       <Text style={styles.destinationMeta}>
         {item.challenges} puzzles • {item.rating} ★
@@ -124,12 +124,12 @@ export default function HomePage() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView className='bg-white'>
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Image
           source={
-            require("../../assets/Side_Image/halong.jpg") as ImageSourcePropType
+            require('../../assets/Side_Image/halong.jpg') as ImageSourcePropType
           }
           style={styles.heroImage}
         />
@@ -143,7 +143,7 @@ export default function HomePage() {
           <TouchableOpacity
             style={styles.button}
             // onPress={() => navigation.navigate('Clues')}
-            onPress={() => Alert.alert("Button Pressed", "Start playing!")}
+            onPress={() => Alert.alert('Button Pressed', 'Start playing!')}
           >
             <Text style={styles.buttonText}>Start playing</Text>
           </TouchableOpacity>
@@ -155,12 +155,12 @@ export default function HomePage() {
       <View
         style={{
           flex: 1,
-          justifyContent: "space-evenly",
-          alignItems: "center",
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
         }}
       >
         <FlatList
-          style={{ alignSelf: "auto" }}
+          style={{ alignSelf: 'auto' }}
           data={packages}
           horizontal
           keyExtractor={(item) => item.id.toString()}
@@ -216,95 +216,95 @@ export default function HomePage() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   section: {
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   heroSection: {
-    flexDirection: "row",
+    flexDirection: 'row',
     margin: 10,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   heroImage: {
-    width: "50%",
+    width: '50%',
     height: 160,
   },
   heroContent: {
     flex: 1,
     padding: 10,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   heroTitle: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 16,
   },
   heroSubtitle: {
-    color: "#555",
+    color: '#555',
     marginVertical: 8,
   },
   button: {
-    backgroundColor: "#0aaff1",
+    backgroundColor: '#0aaff1',
     padding: 10,
     borderRadius: 8,
-    alignSelf: "auto",
+    alignSelf: 'auto',
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    alignSelf: 'center'
+    color: '#fff',
+    fontWeight: 'bold',
+    alignSelf: 'center',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginHorizontal: 10,
     marginVertical: 12,
-    color: "#3B2C04",
+    color: '#3B2C04',
   },
   packageCard: {
-    backgroundColor: "#e0f7ff",
+    backgroundColor: '#e0f7ff',
     padding: 10,
     borderRadius: 10,
     marginRight: 10,
     width: 160,
-    alignItems: "center",
+    alignItems: 'center',
     // marginHorizontal: 15
   },
   packageName: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   destinationCard: {
     width: 160,
     marginRight: 10,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
     padding: 5,
     elevation: 2,
   },
   destinationImage: {
-    width: "100%",
+    width: '100%',
     height: 90,
     borderRadius: 8,
   },
   destinationTitle: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 6,
   },
   destinationMeta: {
     fontSize: 12,
-    color: "#555",
+    color: '#555',
   },
   newTag: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: "#e7505f",
-    color: "#fff",
+    backgroundColor: '#e7505f',
+    color: '#fff',
     fontSize: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
