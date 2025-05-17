@@ -1,0 +1,98 @@
+import { StyleSheet } from 'react-native';
+
+export const alohaRewardsStyles = StyleSheet.create({
+  alohaSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+    backgroundColor: '#0444bf',
+    borderRadius: 16,
+    marginBottom: 40,
+  },
+  alohaHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  alohaTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    marginLeft: 8,
+  },
+  alohaDescription: {
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 16,
+    fontSize: 14,
+  },
+  alohaProgressContainer: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  alohaProgressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  alohaProgressText: {
+    color: 'white',
+    fontWeight: '500',
+  },
+  alohaProgressPoints: {
+    color: 'white',
+    fontWeight: '500',
+  },
+  alohaProgressBar: {
+    height: 10,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  alohaProgressFill: {
+    width: '60%',
+    height: 10,
+    backgroundColor: '#facc15',
+    borderRadius: 5,
+  },
+  alohaNextReward: {
+    marginTop: 6,
+    color: 'white',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  alohaSteps: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  alohaStep: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  alohaStepNumber: {
+    backgroundColor: '#facc15',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  alohaStepNumberText: {
+    color: '#7f1d1d',
+    fontWeight: 'bold',
+  },
+  alohaStepText: {
+    color: 'white',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+});
