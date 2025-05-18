@@ -1,7 +1,8 @@
 // import { homeApi } from '@/features/home/api/HomeApi';
+import { packageApi } from '@/components/api/packageApi';
 import { authApi } from '@/features/auth/api/authApi';
 import { authSlice } from '@/features/auth/slice/authSlice';
-import { packageApi } from '@/features/home/api/packageApi';
+
 import { homeSlice } from '@/features/home/slices/homeSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
