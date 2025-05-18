@@ -9,9 +9,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import TabLayout from "@/components/TabBar";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { store } from "@/store";
+import { Stack } from "expo-router";
 import { Provider } from "react-redux";
 import "./global.css";
 
@@ -37,7 +37,11 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <TabLayout />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+          <Stack.Screen name="AnnualPayment"/>
+          <Stack.Screen name="DaysPayment"/>
+        </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
     </Provider>

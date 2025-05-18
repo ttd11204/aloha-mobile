@@ -1,7 +1,7 @@
 import LoginRegister from "@/features/auth/components/login-register/LoginRegister";
 import React from "react";
 import { View } from "react-native";
-import "./global.css";
+import "../global.css";
 
 export default function LoginPage() {
   return (

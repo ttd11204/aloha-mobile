@@ -5,7 +5,7 @@ export const newsletterStyles = StyleSheet.create({
     backgroundColor: '#fff0f3',
     padding: 20,
     borderRadius: 12,
-    marginBottom: 32,
+    marginBottom: 100,
   },
   newsletterHeader: {
     flexDirection: 'row',
