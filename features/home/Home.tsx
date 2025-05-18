@@ -14,7 +14,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useGetPackageDataQuery } from './api/packageApi';
+
+import { useGetPackageDataQuery } from '@/components/api/packageApi';
+import { useRouter } from 'expo-router';
 import ImageSlider from './components/HomeSlider';
 import PopularChallenges from './components/PopularChallenges';
 import Testimonials from './components/Testimonials';
@@ -84,6 +86,7 @@ export default function HomePage() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const packages = pks || [];
+  const router = useRouter();
 
   const renderPackage = ({ item }: { item: Package }) => (
     <TouchableOpacity
@@ -92,10 +95,10 @@ export default function HomePage() {
         console.log('Package ID:', item.id);
         if (item.id === 1) {
           console.log('Annual Payment');
-          navigation.navigate('AnnualPayment');
+          router.push('/AnnualPayment');
         } else if (item.id === 2) {
           console.log('Days Payment');
-          navigation.navigate('DaysPayment');
+          router.push('/DaysPayment');
         }
         // else {
         //   navigation.navigate('PackageDetail', { id: item.id });
@@ -124,7 +127,7 @@ export default function HomePage() {
   );
 
   return (
-    <ScrollView className='bg-white'>
+    <ScrollView className='bg-white pt-10'>
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Image

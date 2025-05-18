@@ -1,11 +1,15 @@
-import axios from './customizeAxios';
+import { Package } from '@/features/home/types';
+import { baseQueryWithErrorHandling } from '@/lib/baseApi';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
-export const getPackageApi = async () => {
-  try {
-    const response = await axios.get('/Package');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching package:', error);
-    throw error; // Ensure errors are properly handled in the UI
-  }
-};
+export const packageApi = createApi({
+  reducerPath: 'packageApi',
+  baseQuery: baseQueryWithErrorHandling,
+  tagTypes: ['Package'],
+  endpoints: (builder) => ({
+    getPackageData: builder.query<Package[], void>({
+      query: () => '/Package',
+    }),
+  }),
+});
+export const { useGetPackageDataQuery } = packageApi;

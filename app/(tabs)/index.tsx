@@ -1,11 +1,11 @@
 import HomePage from "@/features/home/Home";
 import React from "react";
 import { View } from "react-native";
-import "./global.css";
+import "../global.css";
 
 export default function Index() {
   return (
-    <View className="flex-1 items-center">
+    <View className="items-center">
       <HomePage />
     </View>
   );

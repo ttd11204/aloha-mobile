@@ -5,7 +5,6 @@ import { JwtPayload } from 'jwt-decode';
 import React, { useState } from 'react';
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -291,11 +290,6 @@ export default function LoginRegister() {
       <ScrollView className="flex-grow">
         <View className="flex-1 flex-col">
           {isLogin ? <LoginForm /> : <RegisterForm />}
-          <Image
-            source={require('@/assets/Side_Image/login_pic.jpg')}
-            className="w-full h-96 rounded-2xl"
-            resizeMode="cover"
-          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

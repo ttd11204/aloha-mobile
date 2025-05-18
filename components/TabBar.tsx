@@ -14,7 +14,7 @@ import { Platform } from 'react-native';
    const ACTIVE_ICON_COLOR = "#ffff00";
    const INACTIVE_ICON_COLOR = "#ffffff";
 
-   export default function TabLayout() {
+   export default function TabBarLayout() {
 
      return (
        <Tab.Navigator
