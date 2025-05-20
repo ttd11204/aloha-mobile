@@ -29,6 +29,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="SideQuest"
+        options={{
+          title: 'SideQuest',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="privacy-tip" size={24} color={color} />
+          )
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: 'Home',

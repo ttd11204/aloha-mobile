@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { useRouter } from 'expo-router'
 import { useVerification } from '@/hooks/use-verification'
 
 interface VerificationFormProps {
@@ -25,22 +24,17 @@ export function VerificationForm({
   userId,
   refetch
 }: VerificationFormProps) {
-  // const router = useRouter()
-
   const [code, setCode] = useState('')
   const [selectedClueId, setSelectedClueId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Mock verification function - replace with actual implementation
   const { error, verify, setError } = useVerification()
-  // Create a map from userClues for faster lookup
   const solvedCluesMap = new Map(
     userClues.map((clue) => [clue.clueId, clue.isSolved])
   )
 
-  // Determine if a clue can be unlocked based on its order
   const isClueUnlockable = (order: number) => {
-    if (order === 1) return true // First clue is always unlockable
+    if (order === 1) return true
     return (
       solvedCluesMap.get(
         clues.find((clue) => clue.order === order - 1)?.id || 0
@@ -63,7 +57,6 @@ export function VerificationForm({
         userId,
         refetch,
         () => {
-          // On success - in a real app you might navigate to a success screen
           console.log('Success!')
         },
         setIsLoading
@@ -75,7 +68,6 @@ export function VerificationForm({
 
   return (
     <View className="p-6 rounded-xl border border-blue-200 bg-white shadow mb-4">
-      {/* Form header with blue accent */}
       <View className="flex-row items-center mb-6">
         <View className="h-8 w-2 bg-blue-500 rounded-full mr-3"></View>
         <Text className="text-xl font-semibold text-blue-600">
@@ -87,19 +79,17 @@ export function VerificationForm({
         Select a clue and enter its verification code to unlock it:
       </Text>
 
-      {/* Clue selection buttons */}
       <View className="mb-6 flex-row flex-wrap">
         {clues.map(({ id, order }) => {
           const isSolved = solvedCluesMap.get(id) === true
           const isUnlockable = isClueUnlockable(order)
 
           return (
-            <Pressable
+            <TouchableOpacity
               key={id}
               onPress={() => {
                 if (isUnlockable) {
                   console.log('Selected clue ID:', id)
-                  // Chỉ cập nhật state, không điều hướng
                   setSelectedClueId(id)
                 }
               }}
@@ -128,12 +118,11 @@ export function VerificationForm({
               >
                 Clue {id}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           )
         })}
       </View>
 
-      {/* Verification form */}
       <View className="space-y-4">
         <View className="relative">
           <View className="absolute left-3 top-3 z-10">
@@ -163,7 +152,6 @@ export function VerificationForm({
           ) : (
             <>
               <Text className="text-white font-medium">Verify Code</Text>
-              {/* <ChevronRight size={16} color="#FFFFFF" className="ml-2" /> */}
             </>
           )}
         </Pressable>
