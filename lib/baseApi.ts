@@ -18,7 +18,8 @@ export const baseQueryWithErrorHandling = async (
   api: BaseQueryApi,
   extraOptions: object
 ) => {
-  const result = await customBaseQuery(args, api, extraOptions)
+  const result = await customBaseQuery(args, api, extraOptions);
+  console.log(result);
 
   if (result.error) {
     // const status = result.error.status;
