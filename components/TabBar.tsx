@@ -1,6 +1,7 @@
+import ClueScreen from '@/app/(tabs)/Clue'
 import { HapticTab } from '@/components/HapticTab'
 import LoginRegister from '@/features/auth/components/login-register/LoginRegister'
-import CluePage from '@/features/clue/CluePage'
+import CluesComponent from '@/features/clue/ClueComponent'
 import HomePage from '@/features/home/Home'
 import PrivacyPolicy from '@/features/privacy-policy/PrivacyPolicy'
 import QuestionAnswer from '@/features/QA/QuestionAnswer'
@@ -70,7 +71,7 @@ export default function TabBarLayout() {
       />
       <Tab.Screen
         name="Clue"
-        component={CluePage}
+        component={ClueScreen}
         options={{
           title: 'Clue',
           tabBarIcon: ({ color }) => (
