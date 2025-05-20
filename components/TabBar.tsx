@@ -31,7 +31,7 @@ export default function TabBarLayout() {
     >
       {/* <Tab.Screen
            name="SideQuest"
-           component={SideQuestScreen}
+           component={SideQuestFull}
            options={{
              title: "SideQuest",
              tabBarIcon: ({ color }) => (
