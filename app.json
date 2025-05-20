@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "aloha",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -17,7 +17,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.aloha"
+      "package": "com.anonymous.aloha",
+      "permissions": ["INTERNET"]
     },
     "web": {
       "bundler": "metro",
