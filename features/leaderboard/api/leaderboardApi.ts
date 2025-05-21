@@ -2,8 +2,8 @@ import { UserProgress } from '@/features/leaderboard/types'
 import { baseQueryWithErrorHandling } from '@/lib/baseApi'
 import { ResponseData } from '@/utils'
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
+console.trace('useGetTop3UserByCityIdQuery called')
 export const userProgressApi = createApi({
   reducerPath: 'userProgressApi',
   baseQuery: baseQueryWithErrorHandling,

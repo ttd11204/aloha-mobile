@@ -4,50 +4,6 @@ import { ChevronRight } from 'lucide-react-native'
 import React from 'react'
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
 
-// Define types
-const leaderboardData = [
-  {
-    rank: 1,
-    userId: 'user123',
-    userName: 'Sarah Johnson',
-    totalPoints: 2750,
-    numerOfCity: '8 cities',
-    prize: '10 vouchers'
-  },
-  {
-    rank: 2,
-    userId: 'user456',
-    userName: 'Mark Thompson',
-    totalPoints: 2320,
-    numerOfCity: '7 cities',
-    prize: '5 vouchers'
-  },
-  {
-    rank: 3,
-    userId: 'user789',
-    userName: 'Jenny Kim',
-    totalPoints: 2100,
-    numerOfCity: '6 cities',
-    prize: '5 vouchers'
-  },
-  {
-    rank: 4,
-    userId: 'user101',
-    userName: 'Alex Rivera',
-    totalPoints: 1890,
-    numerOfCity: '5 cities',
-    prize: '2 vouchers'
-  },
-  {
-    rank: 5,
-    userId: 'user202',
-    userName: 'Michael Brown',
-    totalPoints: 1720,
-    numerOfCity: '4 cities',
-    prize: '2 vouchers'
-  }
-]
-
 const avatarGradients = {
   blue: 'bg-sky-500',
   yellow: 'bg-amber-400',
@@ -101,18 +57,18 @@ const LeaderboardItem = ({ item, index }: LeaderboardItemProps) => {
 
         <View>
           <Text className="font-semibold">{item.userName}</Text>
-          <Text className="text-gray-500 text-xs">{item.numerOfCity}</Text>
+          {/* <Text className="text-gray-500 text-xs">{item.numerOfCity}</Text> */}
         </View>
       </View>
 
       <View className="flex-row items-center">
         <View className="mr-2">
           <Text className="font-bold text-right">{item.totalPoints}</Text>
-          <View
+          {/* <View
             className={`rounded-full px-2 py-1 ${getBadgeColor(item.prize)}`}
           >
             <Text className="text-white text-xs">{item.prize}</Text>
-          </View>
+          </View> */}
         </View>
         <ChevronRight width={16} height={16} color="#9ca3af" />
       </View>
@@ -121,16 +77,16 @@ const LeaderboardItem = ({ item, index }: LeaderboardItemProps) => {
 }
 
 const Leaderboard = () => {
-  // const { data: leaderboardData } = useGetTop3UserByCityIdQuery({ cityId: 1 })
+  const { data: leaderboardData } = useGetTop3UserByCityIdQuery({ cityId: 1 })
 
-  // if (!leaderboardData || leaderboardData.le) {
-  //   return (
-  //     <View className="flex-1 items-center justify-center">
-  //       <Text className="text-gray-500">Loading...</Text>
-  //     </View>
-  //   )
-  // }
-  // console.log('Leaderboard data:', leaderboardData.data)
+  if (!leaderboardData || leaderboardData.data.length === 0) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-gray-500">Loading...</Text>
+      </View>
+    )
+  }
+  console.log('Leaderboard data:', leaderboardData.data)
 
   return (
     <View className="rounded-xl p-4 bg-white shadow border border-gray-200">
@@ -142,7 +98,7 @@ const Leaderboard = () => {
       </View>
 
       <FlatList
-        data={leaderboardData}
+        data={leaderboardData.data}
         keyExtractor={(item) => item.userId}
         renderItem={({ item, index }) => (
           <LeaderboardItem item={item} index={index} />
