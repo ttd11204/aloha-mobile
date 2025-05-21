@@ -21,3 +21,8 @@ export type Auction = {
   imageUrl: string;
   id: string;
 };
+
+export interface ResponseData<T> {
+  message: string
+  data: T
+}
