@@ -35,3 +35,14 @@ export interface ClueData {
   userProgresses: any[];
   id: number;
 }
+
+export interface SideQuestCompletionData {
+  pointsEarned: number;
+  currentProgress: string; 
+  message: string; 
+}
+
+export interface SideQuestCompletedResponse {
+  message: string; 
+  data: SideQuestCompletionData;
+}
