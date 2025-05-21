@@ -11,11 +11,14 @@ const Dashboard = () => {
           Treasure Hunt Dashboard
         </Text>
 
-        <View className="space-y-6">
-          <MapComponent />
-          <LeaderboardSection />
-
-          {/* Uncomment if you want to add gallery later
+        <View>
+          <View>
+            <MapComponent />
+          </View>
+          <View className="mt-8 mb-36">
+            <LeaderboardSection />
+          </View>
+          {/* 
           <View className="bg-amber-50 rounded-lg p-8">
             <Text className="text-2xl font-bold text-amber-800 mb-6 text-center">
               Adventure Gallery
