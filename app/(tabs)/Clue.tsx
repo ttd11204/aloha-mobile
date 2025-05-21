@@ -1,5 +1,10 @@
-import CluesComponent from '@/features/clue/ClueComponent'
+import CluesComponent from '@/features/clue/components/CluesComponent'
+import { View } from 'react-native'
 
 export default function ClueScreen() {
-  return <CluesComponent />
+  return (
+    <View className="flex-1 items-center">
+      <CluesComponent />
+    </View>
+  )
 }

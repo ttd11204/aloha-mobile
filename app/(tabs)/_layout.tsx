@@ -23,9 +23,9 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="PrivacyPolicy"
+          name="SideQuest"
           options={{
-            title: 'Privacy',
+            title: 'SideQuest',
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="privacy-tip" size={24} color={color} />
             )
