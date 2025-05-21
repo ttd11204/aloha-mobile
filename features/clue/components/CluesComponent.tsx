@@ -8,13 +8,14 @@ import {
   useGetUserCityCluesQuery,
   usePostClueMutation
 } from '@/features/clue/api/clueApi'
-import LoadingState from '@/features/clue/components/LoadingState'
+// import LoadingState from '@/features/clue/components/LoadingState'
 import ErrorState from '@/features/clue/components/ErrorState'
 import ClueGrid from '@/features/clue/components/ClueGrid'
 import VerificationCodeInput from '@/features/clue/components/VerificationCodeInput'
 import ClueDetails from '@/features/clue/components/ClueDetails'
 import ProgressBar from '@/features/clue/components/ProgressBar'
 import { CluebyCityId } from '@/features/clue/types'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const TreasureHunt = () => {
   const userId = '4b702c68-76ed-4e81-b971-71baffe9f5be' // Replace with actual user ID from your auth context/store
@@ -99,14 +100,12 @@ const TreasureHunt = () => {
         verificationCode.trim().toUpperCase() ===
         selectedClueData.answerCode.toUpperCase()
       ) {
-        // In a real app, you would make an API call to update the solved status
         const res = await postClue({
           clueId: selectedClueData.id,
           answer: verificationCode,
           userId: userId
         }).unwrap()
         console.log('Clue solved:', res)
-        // For now, we'll just simulate success and navigate to congrats page
         // router.push('/dashboard')
       } else {
         setError('Incorrect verification code. Please try again.')
@@ -134,7 +133,7 @@ const TreasureHunt = () => {
 
   // Loading state
   if (isLoadingClues || isLoadingUserClues) {
-    return <LoadingState />
+    return <LoadingSpinner />
   }
 
   // Error state
