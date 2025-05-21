@@ -26,6 +26,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { Challenge, TreasureHuntItem } from '../types'
 import { useSubmitQuestMutation } from '../api/sideQuestApi'
+import * as FileSystem from 'expo-file-system'
 
 interface SideQuestProps {
   challenges: TreasureHuntItem[]
@@ -127,23 +128,27 @@ export function SideQuestLayout({
     }
 
     setIsLoading(true)
-  try {
-    const formData = new FormData()
-    const response = await fetch(selectedFile.uri)
-    const blob = await response.blob()
-    formData.append(
-      'File',
-      blob,
-      selectedFile.fileName || `upload.${selectedFile.uri.split('.').pop() || 'jpg'}`
-    )
+    try {
+      const formData = new FormData()
 
-    const res = await submitQuest({
-      userId,
-      sideQuestId: selectedQuestId,
-      formData // truyền đúng key như mutation yêu cầu
-    }).unwrap()
+      formData.append('File', {
+        uri: selectedFile.uri,
+        name:
+          selectedFile.fileName ||
+          `upload.${selectedFile.uri.split('.').pop() || 'jpg'}`,
+        type: 'image/jpeg'
+      } as any)
 
-      console.log('selected file:', selectedFile)
+      formData.append('UserId', '238ed9f0-7ce1-42c6-92bb-802495195f00')
+      formData.append('SideQuestId', selectedQuestId.toString())
+
+      console.log('FormData:', formData)
+      const res = await submitQuest({
+        userId,
+        sideQuestId: selectedQuestId,
+        formData
+      }).unwrap()
+
       if (
         res.message ===
         "The evidence provided does not match the side quest's requirement."
