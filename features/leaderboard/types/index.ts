@@ -1,4 +1,4 @@
-export type Leaderboard = {
+export type UserProgress = {
   rank: number;
   userId: string;
   userName: string;

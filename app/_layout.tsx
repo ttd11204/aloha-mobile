@@ -35,6 +35,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="AnnualPayment" />
         <Stack.Screen name="DaysPayment" />
+        <Stack.Screen name="Leaderboard" />
       </Stack>
       <StatusBar style="auto" />
     </Provider>

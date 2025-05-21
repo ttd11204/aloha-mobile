@@ -1,4 +1,5 @@
-import { Leaderboard } from '@/features/leaderboard/types'
+import { useGetTop3UserByCityIdQuery } from '@/features/leaderboard/api/leaderboardApi'
+import { UserProgress } from '@/features/leaderboard/types'
 import { ChevronRight } from 'lucide-react-native'
 import React from 'react'
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
@@ -47,7 +48,6 @@ const leaderboardData = [
   }
 ]
 
-// Style constants
 const avatarGradients = {
   blue: 'bg-sky-500',
   yellow: 'bg-amber-400',
@@ -73,7 +73,7 @@ const getBadgeColor = (prize: string) => {
 }
 
 interface LeaderboardItemProps {
-  item: Leaderboard
+  item: UserProgress
   index: number
 }
 
@@ -120,7 +120,18 @@ const LeaderboardItem = ({ item, index }: LeaderboardItemProps) => {
   )
 }
 
-const LeaderboardSection = () => {
+const Leaderboard = () => {
+  // const { data: leaderboardData } = useGetTop3UserByCityIdQuery({ cityId: 1 })
+
+  // if (!leaderboardData || leaderboardData.le) {
+  //   return (
+  //     <View className="flex-1 items-center justify-center">
+  //       <Text className="text-gray-500">Loading...</Text>
+  //     </View>
+  //   )
+  // }
+  // console.log('Leaderboard data:', leaderboardData.data)
+
   return (
     <View className="rounded-xl p-4 bg-white shadow border border-gray-200">
       <View className="flex-row justify-between items-center mb-4">
@@ -143,4 +154,4 @@ const LeaderboardSection = () => {
   )
 }
 
-export default LeaderboardSection
+export default Leaderboard

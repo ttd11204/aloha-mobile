@@ -18,8 +18,8 @@ import { CluebyCityId } from '@/features/clue/types'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const TreasureHunt = () => {
-  const userId = '4b702c68-76ed-4e81-b971-71baffe9f5be' // Replace with actual user ID from your auth context/store
-  const cityId = 1 // Replace with actual city ID from your route params or store
+  const userId = '4b702c68-76ed-4e81-b971-71baffe9f5be'
+  const cityId = 1
 
   // State
   const [selectedClue, setSelectedClue] = useState<number | null>(null)
