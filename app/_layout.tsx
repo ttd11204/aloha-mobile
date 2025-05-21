@@ -36,6 +36,8 @@ export default function RootLayout() {
         <Stack.Screen name="AnnualPayment" />
         <Stack.Screen name="DaysPayment" />
         <Stack.Screen name="Leaderboard" />
+        <Stack.Screen name="SuccessStatus" />
+        <Stack.Screen name="FailStatus" />
       </Stack>
       <StatusBar style="auto" />
     </Provider>
