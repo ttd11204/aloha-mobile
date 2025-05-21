@@ -3,16 +3,16 @@ import { packageApi } from '@/components/api/packageApi'
 import { authApi } from '@/features/auth/api/authApi'
 import { authSlice } from '@/features/auth/slice/authSlice'
 import { clueApi } from '@/features/clue/api/clueApi'
+import { homeApi } from '@/features/home/api/homeApi'
 
-import { homeSlice } from '@/features/home/slices/homeSlice';
-import { questApi } from '@/features/side-quest/api/sideQuestApi';
-import { configureStore } from '@reduxjs/toolkit';
-import { setupListeners } from '@reduxjs/toolkit/query';
+import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
+import { questApi } from '@/features/side-quest/api/sideQuestApi'
+import { configureStore } from '@reduxjs/toolkit'
+import { setupListeners } from '@reduxjs/toolkit/query'
 
 export const store = configureStore({
   reducer: {
     //reducers
-    home: homeSlice.reducer,
     auth: authSlice.reducer,
 
     //api
@@ -20,13 +20,20 @@ export const store = configureStore({
     [packageApi.reducerPath]: packageApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [questApi.reducerPath]: questApi.reducer,
-    [clueApi.reducerPath]: clueApi.reducer
+    [clueApi.reducerPath]: clueApi.reducer,
+    [userProgressApi.reducerPath]: userProgressApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
-    }).concat(packageApi.middleware, authApi.middleware, questApi.middleware, clueApi.middleware),
-});
+      serializableCheck: false
+    }).concat(
+      packageApi.middleware,
+      authApi.middleware,
+      questApi.middleware,
+      clueApi.middleware,
+      userProgressApi.middleware
+    )
+})
 
 setupListeners(store.dispatch)
 // export const persistor = persistStore(store);
