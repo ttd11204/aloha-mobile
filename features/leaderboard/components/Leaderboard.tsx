@@ -86,7 +86,6 @@ const Leaderboard = () => {
       </View>
     )
   }
-  console.log('Leaderboard data:', leaderboardData.data)
 
   return (
     <View className="rounded-xl p-4 bg-white shadow border border-gray-200">
