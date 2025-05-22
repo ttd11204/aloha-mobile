@@ -64,7 +64,7 @@ export default function FailStatus() {
     if (errorInfo?.data.currentProgress) {
       progressWidth.value = withDelay(1200, withTiming(parseFloat(errorInfo.data.currentProgress) / 100, { duration: 800 }));
     }
-  }, [errorData, errorInfo]);
+  }, [errorData]);
   
   // Update hints animation when showHints changes
   useEffect(() => {
