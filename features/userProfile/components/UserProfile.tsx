@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,23 @@ import {
   SafeAreaView,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { useAppDispatch } from '@/store/hooks';
+import { logout } from '@/features/auth/slice/authSlice';
+import LoginRequired from '@/components/LoginRequired';
+import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
 export default function UserProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
 
   const profileData = {
     name: 'Sarah Johnson',
@@ -40,6 +49,36 @@ export default function UserProfile() {
     { label: 'Solved Quest', value: profileData.quest },
     { label: 'Current Rank', value: profileData.rank },
   ];
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (token) {
+          const decode: any = jwtDecode(token);
+          setUserId(decode?.sub || null);
+        } else {
+          setUserId(null);
+        }
+      } catch (e) {
+        setUserId(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkUser();
+  }, []);
+
+  console.log('userId', userId);
+
+    const handleLogout = async () => { 
+      dispatch(logout());
+      setUserId('');
+      router.push('/Login');
+    }
+
+    if (loading) return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" /></View>;
+    if (!userId) return <LoginRequired />;
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -122,10 +161,11 @@ export default function UserProfile() {
               className={`flex-1 py-3 rounded-full ${
                 isFollowing ? 'bg-gray-200' : 'bg-blue-500'
               }`}
+              onPress={handleLogout}
             >
-              <Text className={`text-center font-semibold ${
-                isFollowing ? 'text-gray-700' : 'text-white'
-              }`}>
+              <Text className="text-center font-semibold
+                text-white"
+              >
                 Log Out
               </Text>
             </TouchableOpacity>

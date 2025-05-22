@@ -43,6 +43,7 @@ export default function LoginRegister() {
     setLoading(true);
     try {
       const result = await login({ email, password }).unwrap();
+      console.log('Login result:', result);
       dispatch(setCredentials({ accessToken: result.message.data.accessToken, refreshToken: result.message.data.accessToken }));
       Alert.alert('Login Successfully', 'Welcome to Aloha.');
       router.push('/');
