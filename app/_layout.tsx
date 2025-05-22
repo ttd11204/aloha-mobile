@@ -9,6 +9,7 @@ import { store } from '@/store'
 import { Stack } from 'expo-router'
 import { Provider } from 'react-redux'
 import './global.css'
+import Sidebar from '@/components/SideBar'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -35,6 +36,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="AnnualPayment" />
         <Stack.Screen name="DaysPayment" />
+        <Stack.Screen name="dashboard/Leaderboard" />
         {/* <Stack.Screen name="Leaderboard" /> */}
         <Stack.Screen name="SuccessStatus" />
         <Stack.Screen name="FailStatus" />

@@ -1,4 +1,4 @@
-import ClueScreen from '@/app/(tabs)/Clue'
+import ClueScreen from '@/app/Clue'
 import { HapticTab } from '@/components/HapticTab'
 import LoginRegister from '@/features/auth/components/login-register/LoginRegister'
 import CluesComponent from '@/features/clue/components/CluesComponent'
