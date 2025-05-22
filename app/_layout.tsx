@@ -38,8 +38,11 @@ export default function RootLayout() {
         <Stack.Screen name="DaysPayment" />
         <Stack.Screen name="dashboard/Leaderboard" />
         {/* <Stack.Screen name="Leaderboard" /> */}
-        <Stack.Screen name="SuccessStatus" />
-        <Stack.Screen name="FailStatus" />
+        <Stack.Screen name="SuccessQuest" />
+        <Stack.Screen name="FailQuest" />
+        <Stack.Screen name="SideQuest" />
+        <Stack.Screen name="Login" />
+        <Stack.Screen name="Clue" />
       </Stack>
       <StatusBar style="auto" />
     </Provider>
