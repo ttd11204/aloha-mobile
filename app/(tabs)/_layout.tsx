@@ -1,8 +1,15 @@
 import Sidebar from '@/components/SideBar'
-import { AntDesign, Entypo, FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+import {
+  AntDesign,
+  Entypo,
+  FontAwesome,
+  FontAwesome5,
+  MaterialIcons
+} from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import { useState } from 'react'
-import { Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { blue } from 'react-native-reanimated/lib/typescript/Colors'
 
 const BLUE_TAB_COLOR = '#0095ff'
 const ACTIVE_ICON_COLOR = '#ffff00'
@@ -13,13 +20,27 @@ export default function TabLayout() {
 
   return (
     <>
-      <Sidebar visible={isSidebarVisible} onClose={() => setSidebarVisible(false)} />
+      <Sidebar
+        visible={isSidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
 
-      <View className='h-14 bg-white justify-between p-4 flex-row items-center' >
-          <Text style={{ fontSize: 20, color: 'black' }}>Aloha Vietnam</Text>
+      <View className="h-20 bg-[#0095ff] justify-between px-5 py-4 flex-row items-center">
         <TouchableOpacity onPress={() => setSidebarVisible(true)}>
-          <Entypo name="menu" size={28} color="black" />
+          <Entypo name="menu" size={28} color="white" />
         </TouchableOpacity>
+
+        <View className="flex-row items-center gap-3">
+          <Text
+            style={{
+              fontSize: 20,
+              color: 'white',
+              fontWeight: '600'
+            }}
+          >
+            Aloha Vietnam
+          </Text>
+        </View>
       </View>
       <Tabs
         screenOptions={{
