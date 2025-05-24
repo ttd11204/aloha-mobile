@@ -15,7 +15,7 @@ export default function TabLayout() {
     <>
       <Sidebar visible={isSidebarVisible} onClose={() => setSidebarVisible(false)} />
 
-      <View className='h-14 bg-white justify-between p-4' style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View className='h-14 bg-white justify-between p-4 flex-row items-center' >
           <Text style={{ fontSize: 20, color: 'black' }}>Aloha Vietnam</Text>
         <TouchableOpacity onPress={() => setSidebarVisible(true)}>
           <Entypo name="menu" size={28} color="black" />
