@@ -25,12 +25,11 @@ export default function TabLayout() {
         onClose={() => setSidebarVisible(false)}
       />
 
-      <View className="h-20 bg-[#0095ff] justify-between px-5 py-4 flex-row items-center">
-        <TouchableOpacity onPress={() => setSidebarVisible(true)}>
-          <Entypo name="menu" size={28} color="white" />
-        </TouchableOpacity>
-
-        <View className="flex-row items-center gap-3">
+      <View className="h-20 bg-[#0095ff] px-5 py-4">
+        <View className="flex-row items-center justify-between gap-3 pt-4">
+          <TouchableOpacity onPress={() => setSidebarVisible(true)}>
+            <Entypo name="menu" size={28} color="white" />
+          </TouchableOpacity>
           <Text
             style={{
               fontSize: 20,
