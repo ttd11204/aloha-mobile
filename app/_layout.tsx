@@ -1,49 +1,50 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import "react-native-reanimated";
+import { useFonts } from 'expo-font'
+import * as SplashScreen from 'expo-splash-screen'
+import { StatusBar } from 'expo-status-bar'
+import { useEffect } from 'react'
+import 'react-native-reanimated'
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { store } from "@/store";
-import { Stack } from "expo-router";
-import { Provider } from "react-redux";
-import "./global.css";
+import { useColorScheme } from '@/hooks/useColorScheme'
+import { store } from '@/store'
+import { Stack } from 'expo-router'
+import { Provider } from 'react-redux'
+import './global.css'
+import Sidebar from '@/components/SideBar'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme()
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf')
+  })
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync()
     }
-  }, [loaded]);
+  }, [loaded])
 
   if (!loaded) {
-    return null;
+    return null
   }
 
   return (
     <Provider store={store}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-          <Stack.Screen name="AnnualPayment"/>
-          <Stack.Screen name="DaysPayment"/>
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="AnnualPayment" />
+        <Stack.Screen name="DaysPayment" />
+        <Stack.Screen name="Leaderboard" />
+        {/* <Stack.Screen name="Leaderboard" /> */}
+        <Stack.Screen name="SuccessQuest" />
+        <Stack.Screen name="FailQuest" />
+        <Stack.Screen name="SideQuest" />
+        <Stack.Screen name="Login" />
+        <Stack.Screen name="Clue" />
+      </Stack>
+      <StatusBar style="auto" />
     </Provider>
-  );
+  )
 }
