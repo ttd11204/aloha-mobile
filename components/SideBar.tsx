@@ -19,7 +19,7 @@ interface SidebarProps {
 const menuItems = [
   {
     label: 'Dashboard',
-    route: '/Leaderboard',
+    route: '/Dashboard',
     icon: '📊',
     backgroundColor: '#187af2'
   },

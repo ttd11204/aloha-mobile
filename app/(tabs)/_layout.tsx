@@ -106,7 +106,10 @@ export default function TabLayout() {
             )
           }}
         />
-        <Tabs.Screen name="leaderboard" options={{ title: 'Leaderboard' }} />
+        <Tabs.Screen
+          name="leaderboard"
+          options={{ title: 'Leaderboard', tabBarButton: () => null }}
+        />
       </Tabs>
     </>
   )
