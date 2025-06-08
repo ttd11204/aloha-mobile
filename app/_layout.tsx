@@ -43,6 +43,7 @@ export default function RootLayout() {
         <Stack.Screen name="SideQuest" />
         <Stack.Screen name="Login" />
         <Stack.Screen name="Clue" />
+        <Stack.Screen name="StreetView" />
       </Stack>
       <StatusBar style="auto" />
     </Provider>

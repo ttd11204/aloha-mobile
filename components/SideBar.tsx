@@ -30,7 +30,8 @@ const menuItems = [
     icon: '⚡',
     backgroundColor: '#187af2'
   },
-  { label: 'Q&A', route: '/(tabs)/QA', icon: '❓', backgroundColor: '#187af2' }
+  { label: 'Q&A', route: '/(tabs)/QA', icon: '❓', backgroundColor: '#187af2' },
+  { label: 'StreetView', route: '/StreetView', icon: '❓', backgroundColor: '#187af2' }
 ]
 
 export default function Sidebar({ visible, onClose }: SidebarProps) {
