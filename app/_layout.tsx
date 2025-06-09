@@ -44,6 +44,7 @@ export default function RootLayout() {
         <Stack.Screen name="Login" />
         <Stack.Screen name="Clue" />
         <Stack.Screen name="StreetView" />
+        <Stack.Screen name="EventDetails" />
       </Stack>
       <StatusBar style="auto" />
     </Provider>
