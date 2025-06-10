@@ -7,6 +7,7 @@ import { homeApi } from '@/features/home/api/homeApi'
 
 import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
 import { questApi } from '@/features/side-quest/api/sideQuestApi'
+import { userApi } from '@/features/userProfile/api/userProfileApi'
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 
@@ -21,7 +22,8 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [questApi.reducerPath]: questApi.reducer,
     [clueApi.reducerPath]: clueApi.reducer,
-    [userProgressApi.reducerPath]: userProgressApi.reducer
+    [userProgressApi.reducerPath]: userProgressApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -31,7 +33,8 @@ export const store = configureStore({
       authApi.middleware,
       questApi.middleware,
       clueApi.middleware,
-      userProgressApi.middleware
+      userProgressApi.middleware,
+      userApi.middleware,
     )
 })
 
