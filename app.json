@@ -9,7 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.aloha",
+      "associatedDomains": ["applinks:aloha.payment.callback"]
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +20,18 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.aloha",
-      "permissions": ["INTERNET"]
+      "permissions": ["INTERNET"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "aloha"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
