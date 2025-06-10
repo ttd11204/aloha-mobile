@@ -3,6 +3,7 @@ import { packageApi } from '@/components/api/packageApi'
 import { authApi } from '@/features/auth/api/authApi'
 import { authSlice } from '@/features/auth/slice/authSlice'
 import { clueApi } from '@/features/clue/api/clueApi'
+import { reviewApi } from '@/features/clue/api/reviewApi'
 import { homeApi } from '@/features/home/api/homeApi'
 
 import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
@@ -26,6 +27,7 @@ export const store = configureStore({
     [userProgressApi.reducerPath]: userProgressApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -37,7 +39,8 @@ export const store = configureStore({
       clueApi.middleware,
       userProgressApi.middleware,
       userApi.middleware,
-      paymentApi.middleware
+      paymentApi.middleware,
+      reviewApi.middleware
     )
 })
 

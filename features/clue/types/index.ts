@@ -45,3 +45,4 @@ export interface PostClueResponse {
   currentProgress: string
   nextClue: number | null
 }
+

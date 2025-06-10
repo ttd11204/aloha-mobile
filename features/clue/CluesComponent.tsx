@@ -16,9 +16,9 @@ import { CluebyCityId } from '@/features/clue/types'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useAppSelector } from '@/store/hooks'
 import { skipToken } from '@reduxjs/toolkit/query'
-import ClueModal from '@/features/clue/components/ClueModal'
+import ReviewModal from '@/features/clue/components/ReviewModal'
 
-const TreasureHunt = () => {
+const CluesComponent = () => {
   const userId = useAppSelector((state) => state.auth.userId)
   const cityId = 1
 
@@ -95,7 +95,7 @@ const TreasureHunt = () => {
         }).unwrap()
         setTimeout(() => {
           setShowReviewPopup(true)
-        }, 2000)
+        }, 800)
       } else {
         setError('Incorrect verification code. Please try again.')
       }
@@ -152,8 +152,9 @@ const TreasureHunt = () => {
           onVerify={verifyCode}
         />
 
-        {showReviewPopup && (
-          <ClueModal
+        {selectedClue && (
+          <ReviewModal
+            clueId={selectedClue}
             visible={showReviewPopup}
             onClose={handleCloseModal}
             onSubmitFeedback={handleSubmitFeedback}
@@ -179,4 +180,4 @@ const TreasureHunt = () => {
   )
 }
 
-export default TreasureHunt
+export default CluesComponent
