@@ -9,7 +9,7 @@ type ErrorStateProps = {
 }
 
 const ErrorState = ({
-  onRetry = () => router.replace('/Leaderboard'),
+  onRetry = () => router.replace('/Dashboard'),
   message = 'Failed to load clues. Please check your connection and try again.'
 }: ErrorStateProps) => {
   return (
