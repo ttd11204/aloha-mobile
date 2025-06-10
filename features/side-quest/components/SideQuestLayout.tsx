@@ -139,10 +139,10 @@ export function SideQuestLayout({
         type: 'image/jpeg'
       } as any)
 
-      formData.append('UserId', '238ed9f0-7ce1-42c6-92bb-802495195f00')
-      formData.append('SideQuestId', selectedQuestId.toString())
+      // formData.append('UserId', '238ed9f0-7ce1-42c6-92bb-802495195f00')
+      // formData.append('SideQuestId', selectedQuestId.toString())
 
-      console.log('FormData:', formData)
+      // console.log('FormData:', formData)
       const res = await submitQuest({
         userId,
         sideQuestId: selectedQuestId,
