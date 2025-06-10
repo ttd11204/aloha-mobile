@@ -9,6 +9,8 @@ export type Package = {
   description: string;
   isFree: boolean;
   price: number;
+  fromDate: string;
+  toDate: string;
   city: any;
   feedbacks: any[];
   payments: any;

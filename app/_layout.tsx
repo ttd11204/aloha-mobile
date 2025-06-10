@@ -34,7 +34,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="AnnualPayment" />
+        <Stack.Screen name="Payment" />
         <Stack.Screen name="DaysPayment" />
         <Stack.Screen name="Leaderboard" />
         {/* <Stack.Screen name="Leaderboard" /> */}

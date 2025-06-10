@@ -6,6 +6,7 @@ import { clueApi } from '@/features/clue/api/clueApi'
 import { homeApi } from '@/features/home/api/homeApi'
 
 import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
+import { paymentApi } from '@/features/orderPayment/api/paymentApi'
 import { questApi } from '@/features/side-quest/api/sideQuestApi'
 import { userApi } from '@/features/userProfile/api/userProfileApi'
 import { configureStore } from '@reduxjs/toolkit'
@@ -24,6 +25,7 @@ export const store = configureStore({
     [clueApi.reducerPath]: clueApi.reducer,
     [userProgressApi.reducerPath]: userProgressApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -35,6 +37,7 @@ export const store = configureStore({
       clueApi.middleware,
       userProgressApi.middleware,
       userApi.middleware,
+      paymentApi.middleware
     )
 })
 

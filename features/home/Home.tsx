@@ -93,16 +93,7 @@ export default function HomePage() {
       style={styles.packageCard}
       onPress={() => {
         console.log('Package ID:', item.id);
-        if (item.id === 1) {
-          console.log('Annual Payment');
-          router.push('/AnnualPayment');
-        } else if (item.id === 2) {
-          console.log('Days Payment');
-          router.push('/DaysPayment');
-        }
-        // else {
-        //   navigation.navigate('PackageDetail', { id: item.id });
-        // }
+        router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
       }}
     >
       <Text style={styles.packageName}>{item.name}</Text>

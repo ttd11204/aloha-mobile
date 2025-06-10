@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   SafeAreaView,
   ScrollView,
   Text,
@@ -14,32 +15,29 @@ import {
 } from "react-native";
 import DaysOrderPage from "../days/DaysPayment";
 import ProgressBar from "../progressBar/ProgressBar";
+import { useGetPackageDataByIdQuery } from '@/components/api/packageApi';
+import { formatDate } from "@/utils";
 
 const AnnualOrderPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { id = "1" } = (route as { params?: { id?: string } }).params || {};
 
+  // Lấy thông tin package theo id
+  const {
+    data: packageData,
+    isLoading: isPackageLoading,
+    error: packageError,
+  } = useGetPackageDataByIdQuery(Number(id));
+
   const [userId, setUserId] = useState("");
   const [origin, setOrigin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   // Set origin based on platform
-  //   setOrigin(Platform.OS === "ios" ? "ios-app" : "android-app");
-
-  //   // Fetch package data
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await getPackageApi();
-  //       console.log(res);
-  //     } catch (error) {
-  //       console.error("Error fetching package data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [id]);
+  useEffect(() => {
+    // Set origin based on platform
+    setOrigin(Platform.OS === "ios" ? "ios-app" : "android-app");
+  }, []);
 
   useEffect(() => {
     const getToken = async () => {
@@ -59,10 +57,22 @@ const AnnualOrderPage = () => {
     getToken();
   }, []);
 
-  // Render DaysPayment component if id is 2
-  if (id === "2") {
-    return <DaysOrderPage />;
+  if (isPackageLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#187af2" />
+      </View>
+    );
   }
+
+  if (packageError || !packageData) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text>Không tìm thấy thông tin gói dịch vụ.</Text>
+      </View>
+    );
+  }
+
 
   // const handlePayment = async () => {
   //   setIsLoading(true);
@@ -111,7 +121,7 @@ const AnnualOrderPage = () => {
           {/* Package Info */}
           <View className="px-4 mb-6">
             <Text className="text-xl font-bold text-[#187af2] mb-2">
-              Forever Premium Package
+              {packageData.description}
             </Text>
             <View className="flex-row items-center">
               <Ionicons
@@ -144,15 +154,17 @@ const AnnualOrderPage = () => {
                 <View className="flex-row justify-between items-center mb-2">
                   <View>
                     <Text className="text-lg font-bold text-[#1F2937]">
-                      Annual Plan
+                      {packageData.description}
                     </Text>
-                    <Text className="text-xs text-[#10B981] font-medium mt-1">
-                      Save 20%
-                    </Text>
+                    {packageData.isFree ? (
+                      <Text className="text-xs text-[#10B981] font-medium mt-1">
+                        Miễn phí
+                      </Text>
+                    ) : null}
                   </View>
                   <View className="items-end">
                     <Text className="text-xl text-[#10B981] font-bold">
-                      US$7/mo
+                      {packageData.isFree ? 'Free' : `$${packageData.price}/mo`}
                     </Text>
                     <Text className="text-xs text-[#6B7280]">incl. VAT</Text>
                   </View>
@@ -174,7 +186,7 @@ const AnnualOrderPage = () => {
                   <View className="flex-row justify-between mb-2">
                     <Text className="text-sm text-[#6B7280]">Order Total</Text>
                     <Text className="text-sm text-[#1F2937] font-medium">
-                      US$7/mo
+                      {`$${packageData.price}/mo`}
                     </Text>
                   </View>
                 </View>
@@ -204,7 +216,7 @@ const AnnualOrderPage = () => {
                 <View className="flex-row items-start mt-2">
                   <View className="w-1 h-5 bg-[#60A5FA] rounded-sm mr-2 mt-0.5"></View>
                   <Text className="text-sm text-[#4B5563] flex-1">
-                    Cancel before Apr 08, 2025 to avoid getting billed
+                    `Cancel before {formatDate(new Date(packageData.toDate))} to avoid getting billed`
                   </Text>
                 </View>
                 <View className="flex-row items-start mt-2">
@@ -274,7 +286,7 @@ const AnnualOrderPage = () => {
                           <Text className="text-[#DC2626] font-bold">FROM</Text>
                         </View>
                         <Text className="text-xs text-[#6B7280] font-medium">
-                          March 24, 2025
+                          {formatDate(new Date(packageData.fromDate))}
                         </Text>
                       </View>
                       <View className="flex-row justify-between items-center">
@@ -283,7 +295,7 @@ const AnnualOrderPage = () => {
                         </Text>
                         <View className="flex-row items-end">
                           <Text className="text-2xl font-bold text-[#4F46E5]">
-                            $7
+                            {`$${packageData.price}`}
                           </Text>
                           <Text className="text-sm text-[#6B7280] ml-1">
                             /mo
@@ -335,7 +347,7 @@ const AnnualOrderPage = () => {
                       <View className="flex-row justify-between items-center">
                         <Text className="text-[#10B981] font-bold">TO</Text>
                         <Text className="text-sm text-[#6B7280] font-medium">
-                          March 24, 2026
+                          {formatDate(new Date(packageData.toDate))}
                         </Text>
                       </View>
                       <Text className="text-sm text-[#6B7280] mt-2">
@@ -366,7 +378,7 @@ const AnnualOrderPage = () => {
                     </Text>
                     <View className="items-end">
                       <Text className="text-lg font-bold text-[#111827]">
-                        $7.00
+                       {`$${packageData.price}.00`}
                       </Text>
                       <Text className="text-xs text-[#6B7280]">
                         billed annually
@@ -383,7 +395,7 @@ const AnnualOrderPage = () => {
                       <Text className="text-xs text-[#6B7280]">•••• 4242</Text>
                     </View>
                     <Text className="text-xs text-[#6B7280]">
-                      Next charge: April 24, 2025
+                      `Next charge: ${packageData.price} on {formatDate(new Date(packageData.toDate))}`
                     </Text>
                   </View>
                 </View>

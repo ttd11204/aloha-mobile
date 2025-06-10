@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import "./global.css";
-import AnnualOrderPage from "@/features/orderPayment/components/annual/AnnualPayment";
+import AnnualOrderPage from "@/features/orderPayment/components/annual/Payment";
 
 export default function AnnualPaymentPage() {
   return (
