@@ -1,4 +1,4 @@
-import CluesComponent from '@/features/clue/components/CluesComponent'
+import CluesComponent from '@/features/clue/CluesComponent'
 import { View } from 'react-native'
 
 export default function ClueScreen() {

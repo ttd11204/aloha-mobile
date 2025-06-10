@@ -1,20 +1,64 @@
 import React, { useState } from 'react'
-import { View, Text, Modal, TouchableOpacity, TextInput } from 'react-native'
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  TextInput,
+  Alert
+} from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
+import { useAppSelector } from '@/store/hooks'
+import { usePostReviewMutation } from '@/features/clue/api/reviewApi'
 
-interface ClueModalProps {
+type ClueModalProps = {
+  clueId: number
   visible: boolean
   onClose: () => void
   onSubmitFeedback: (feedback: string, rating: number) => void
 }
 
 const ClueModal: React.FC<ClueModalProps> = ({
+  clueId,
   visible,
   onClose,
   onSubmitFeedback
 }) => {
+  const userId = useAppSelector((state) => state.auth.userId) as string | null
   const [feedback, setFeedback] = useState('')
   const [rating, setRating] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const [postReview] = usePostReviewMutation()
+
+  const handleSubmit = async () => {
+    if (feedback.trim() === '' || rating === 0 || !userId) {
+      alert('Please provide feedback, rating and ensure you are logged in.')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      await postReview({
+        userId: userId,
+        review: {
+          clueId: clueId,
+          rating,
+          comment: feedback
+        }
+      }).unwrap()
+
+      onSubmitFeedback(feedback, rating)
+      setFeedback('')
+      setRating(0)
+      onClose()
+    } catch (error) {
+      Alert.alert('Error', 'Failed to submit review. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const renderStars = () => (
     <View className="flex-row justify-center mb-3">
@@ -57,13 +101,12 @@ const ClueModal: React.FC<ClueModalProps> = ({
           <TouchableOpacity
             className="bg-blue-500 rounded-md p-2 items-center my-1"
             onPress={() => {
-              onSubmitFeedback(feedback, rating)
-              setFeedback('')
-              setRating(0)
-              onClose()
+              handleSubmit()
             }}
           >
-            <Text className="text-white font-semibold">Submit Feedback</Text>
+            <Text className="text-white font-semibold">
+              {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onClose} className="mt-2 items-center">
