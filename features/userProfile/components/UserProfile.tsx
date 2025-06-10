@@ -17,7 +17,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { logout } from '@/features/auth/slice/authSlice';
 import LoginRequired from '@/components/LoginRequired';
 import { router } from 'expo-router';
-import { useGetUserProfileQuery } from '../api/userProfileApi';
+import { useGetUserProfileQuery, useGetUserStatsQuery } from '../api/userProfileApi';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,6 +26,7 @@ export default function UserProfile() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const {data: profile, isFetching: profileFetching, isLoading: profileLoading} = useGetUserProfileQuery(userId ?? '')
+  const {data: stat, isFetching: statsFetching, isLoading: statsLoading} = useGetUserStatsQuery(userId ?? '')
   const dispatch = useAppDispatch();
 
   const profileData = {
@@ -47,9 +48,9 @@ export default function UserProfile() {
   ];
 
   const stats = [
-    { label: 'Solved Clue', value: profileData.clue },
-    { label: 'Solved Quest', value: profileData.quest },
-    { label: 'Current Rank', value: profileData.rank },
+    { label: 'Solved Clue', value: stat?.solvedClues },
+    { label: 'Solved Quest', value: stat?.solvedQuests },
+    { label: 'Current Rank', value: stat?.currentRank },
   ];
 
   useEffect(() => {

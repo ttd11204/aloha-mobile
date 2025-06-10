@@ -1,6 +1,6 @@
 import { baseQueryWithErrorHandling } from "@/lib/baseApi";
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { UserProfile } from "../types";
+import { UserGameProfile, UserProfile } from "../types";
 
 export const userApi = createApi({
     reducerPath: "userApi",
@@ -11,6 +11,10 @@ export const userApi = createApi({
             query: (id) => `/User/profile/${id}`,
             providesTags: ["UserProfile"],
         }),
+        getUserStats: builder.query<UserGameProfile, string>({
+            query: (id) => `/User/stats/${id}`,
+            providesTags: ["UserProfile"],
+        }),
     })
 });
-export const { useGetUserProfileQuery } = userApi;
+export const { useGetUserProfileQuery, useGetUserStatsQuery } = userApi;
