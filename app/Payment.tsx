@@ -1,12 +1,12 @@
 import React from "react";
 import { View } from "react-native";
 import "./global.css";
-import AnnualOrderPage from "@/features/orderPayment/components/annual/Payment";
+import Payment from "@/features/orderPayment/components/payment/Payment";
 
-export default function AnnualPaymentPage() {
+export default function PaymentPage() {
   return (
     <View className="flex-1 items-center">
-      <AnnualOrderPage />
+      <Payment />
     </View>
   );
 }

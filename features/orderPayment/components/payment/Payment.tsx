@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -13,12 +14,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import DaysOrderPage from "../days/DaysPayment";
 import ProgressBar from "../progressBar/ProgressBar";
 import { useGetPackageDataByIdQuery } from '@/components/api/packageApi';
 import { formatDate } from "@/utils";
+import { useCreatePaymentMutation } from '@/features/orderPayment/api/paymentApi';
+import { useRouter } from 'expo-router';
 
-const AnnualOrderPage = () => {
+const FRONTEND_URL = 'aloha://payment-callback';
+
+const Payment = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { id = "1" } = (route as { params?: { id?: string } }).params || {};
@@ -33,6 +37,8 @@ const AnnualOrderPage = () => {
   const [userId, setUserId] = useState("");
   const [origin, setOrigin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [createPayment] = useCreatePaymentMutation();
+  const router = useRouter();
 
   useEffect(() => {
     // Set origin based on platform
@@ -74,21 +80,29 @@ const AnnualOrderPage = () => {
   }
 
 
-  // const handlePayment = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await postPaymentApi(userId, Number(id) || 0, origin, 2);
+  const handlePayment = async () => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('UserId', userId);
+      formData.append('PackageId', String(packageData.id));
+      formData.append('FrontEndUrl', FRONTEND_URL);
+      formData.append('Method', '2');
 
-  //     // Open payment URL in browser
-  //     if (response.data && response.data.paymentUrl) {
-  //       await Linking.openURL(response.data.paymentUrl);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error when processing payment:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+      const response = await createPayment(formData).unwrap();
+      console.log("Payment response:", response);
+      const paymentUrl = response?.data?.paymentUrl;
+      if (paymentUrl) {
+        await Linking.openURL(paymentUrl);
+      } else {
+        router.push({ pathname: '/PaymentResult', params: { status: 'failed' } });
+      }
+    } catch (error) {
+      router.push({ pathname: '/PaymentResult', params: { status: 'failed' } });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View className="flex-1 bg-[#f5f7fb]">
@@ -427,7 +441,7 @@ const AnnualOrderPage = () => {
 
               <TouchableOpacity
                 className="bg-[#4F46E5] rounded-xl py-3 px-4 items-center justify-center flex-1 shadow-sm"
-                // onPress={handlePayment}
+                onPress={handlePayment}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -459,4 +473,4 @@ const AnnualOrderPage = () => {
   );
 };
 
-export default AnnualOrderPage;
+export default Payment;
