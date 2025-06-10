@@ -9,7 +9,6 @@ import {
 import { Tabs } from 'expo-router'
 import { useState } from 'react'
 import { Image, Platform, Text, TouchableOpacity, View } from 'react-native'
-import { blue } from 'react-native-reanimated/lib/typescript/Colors'
 
 const BLUE_TAB_COLOR = '#0095ff'
 const ACTIVE_ICON_COLOR = '#ffff00'
@@ -80,11 +79,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="Clue"
+          name="Review"
           options={{
-            title: 'Clue',
+            title: 'Review',
             tabBarIcon: ({ color }) => (
-              <AntDesign name="question" size={24} color={color} />
+              <MaterialIcons name="rate-review" size={24} color={color} />
             )
           }}
         />
@@ -97,7 +96,7 @@ export default function TabLayout() {
             )
           }}
         />
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="Status"
           options={{
             title: 'Status',
@@ -109,7 +108,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="leaderboard"
           options={{ title: 'Leaderboard', tabBarButton: () => null }}
-        />
+        /> */}
       </Tabs>
     </>
   )

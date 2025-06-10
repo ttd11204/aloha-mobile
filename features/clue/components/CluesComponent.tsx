@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ScrollView, View, Text } from 'react-native'
+import { ScrollView, View, Text, TouchableOpacity, Modal } from 'react-native'
 import { router } from 'expo-router'
 
 import {
@@ -16,11 +16,13 @@ import { CluebyCityId } from '@/features/clue/types'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useAppSelector } from '@/store/hooks'
 import { skipToken } from '@reduxjs/toolkit/query'
+import ClueModal from '@/features/clue/components/ClueModal'
 
 const TreasureHunt = () => {
   const userId = useAppSelector((state) => state.auth.userId)
   const cityId = 1
 
+  const [showReviewPopup, setShowReviewPopup] = useState(false)
   const [selectedClue, setSelectedClue] = useState<number | null>(null)
   const [verificationCode, setVerificationCode] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -91,8 +93,9 @@ const TreasureHunt = () => {
           answer: verificationCode,
           userId
         }).unwrap()
-        console.log('Clue solved:', res)
-        // router.push('/dashboard')
+        setTimeout(() => {
+          setShowReviewPopup(true)
+        }, 2000)
       } else {
         setError('Incorrect verification code. Please try again.')
       }
@@ -102,6 +105,14 @@ const TreasureHunt = () => {
     } finally {
       setIsVerifying(false)
     }
+  }
+
+  const handleCloseModal = () => {
+    setShowReviewPopup(false)
+  }
+
+  const handleSubmitFeedback = (feedback: string, rating: number) => {
+    console.log('User feedback:', feedback, 'Rating:', rating)
   }
 
   const getClueData = (clueNumber: number): CluebyCityId | undefined => {
@@ -140,6 +151,14 @@ const TreasureHunt = () => {
           error={error}
           onVerify={verifyCode}
         />
+
+        {showReviewPopup && (
+          <ClueModal
+            visible={showReviewPopup}
+            onClose={handleCloseModal}
+            onSubmitFeedback={handleSubmitFeedback}
+          />
+        )}
 
         {cityClues && selectedClue && getClueData(selectedClue) && (
           <ClueDetails
