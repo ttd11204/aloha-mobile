@@ -75,7 +75,8 @@ export default function LoginRegister() {
     }
     setIsLoading(true)
     try {
-      await register({ email, name, password, confirmPassword }).unwrap()
+      const res = await register({ name, email, password, confirmPassword }).unwrap()
+      console.log('register: ', res)
       setIsLogin(true)
     } catch (error: any) {
       Alert.alert(
