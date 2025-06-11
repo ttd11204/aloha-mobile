@@ -29,28 +29,57 @@ export default function RootLayout() {
     }
   }, [loaded])
 
-  // Lắng nghe deep link aloha://payment-callback
+  // Enhanced deep link handling for payment callbacks
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
       const url = event.url
+      console.log('Received deep link:', url)
+      
       if (url.startsWith('aloha://payment-callback')) {
-        const match = url.match(/status=([^&]+)/)
-        const status = match ? match[1] : 'success'
-        router.push({ pathname: '/PaymentResult', params: { status } })
+        // Parse URL parameters more robustly
+        const urlObj = new URL(url.replace('aloha://', 'https://dummy.com/'))
+        const status = urlObj.searchParams.get('status') || 'success'
+        const transactionId = urlObj.searchParams.get('transactionId')
+        const amount = urlObj.searchParams.get('amount')
+        
+        // Navigate with all available parameters
+        const params: any = { status }
+        if (transactionId) params.transactionId = transactionId
+        if (amount) params.amount = amount
+        
+        router.push({ pathname: '/PaymentResult', params })
+      }
+      // Handle universal links as fallback
+      else if (url.includes('/payment-callback') || url.includes('/app/payment-callback')) {
+        try {
+          const urlObj = new URL(url)
+          const status = urlObj.searchParams.get('status') || 'success'
+          const transactionId = urlObj.searchParams.get('transactionId')
+          
+          const params: any = { status }
+          if (transactionId) params.transactionId = transactionId
+          
+          router.push({ pathname: '/PaymentResult', params })
+        } catch (error) {
+          console.error('Error parsing universal link:', error)
+          router.push({ pathname: '/PaymentResult', params: { status: 'error' } })
+        }
       }
     }
+    
     const subscription = Linking.addEventListener('url', handleDeepLink)
+    
+    // Handle app launch from deep link
     Linking.getInitialURL().then((url) => {
-      if (url && url.startsWith('aloha://payment-callback')) {
-        const match = url.match(/status=([^&]+)/)
-        const status = match ? match[1] : 'success'
-        router.push({ pathname: '/PaymentResult', params: { status } })
+      if (url) {
+        handleDeepLink({ url })
       }
     })
+    
     return () => {
       subscription.remove()
     }
-  }, [])
+  }, [router])
 
   if (!loaded) {
     return null

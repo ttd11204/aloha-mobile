@@ -18,7 +18,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-type PaymentStatus = 'success' | 'failed';
+type PaymentStatus = 'success' | 'failed' | 'pending' | 'error';
 
 interface PaymentResultScreenProps {
   initialStatus?: PaymentStatus;
@@ -29,8 +29,13 @@ const PaymentResult: React.FC<PaymentResultScreenProps> = ({
 }) => {
   const params = useLocalSearchParams();
   const statusParam = typeof params.status === 'string' ? params.status : undefined;
+  const transactionId = typeof params.transactionId === 'string' ? params.transactionId : undefined;
+  const amount = typeof params.amount === 'string' ? params.amount : undefined;
+  
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
-    statusParam === 'success' || statusParam === 'failed' ? statusParam : initialStatus
+    statusParam && ['success', 'failed', 'pending', 'error'].includes(statusParam) 
+      ? statusParam as PaymentStatus 
+      : initialStatus
   );
   const router = useRouter();
 

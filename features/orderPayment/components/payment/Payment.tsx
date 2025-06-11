@@ -13,6 +13,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import ProgressBar from "../progressBar/ProgressBar";
 import { useGetPackageDataByIdQuery } from '@/components/api/packageApi';
@@ -20,7 +21,10 @@ import { formatDate } from "@/utils";
 import { useCreatePaymentMutation } from '@/features/orderPayment/api/paymentApi';
 import { useRouter } from 'expo-router';
 
-const FRONTEND_URL = 'aloha://payment-callback';
+// Multiple fallback URLs for better compatibility
+const MOBILE_CALLBACK_URL = 'aloha://payment-callback';
+// const WEB_FALLBACK_URL = 'https://your-domain.com/payment-callback'; // Replace with your actual domain
+// const UNIVERSAL_LINK = 'https://your-domain.com/app/payment-callback'; // Universal link fallback
 
 const Payment = () => {
   const navigation = useNavigation();
@@ -49,14 +53,35 @@ const Payment = () => {
     const getToken = async () => {
       try {
         const token = await AsyncStorage.getItem("accessToken");
+        console.log("Retrieved token:", token ? "Token exists" : "No token found"); // Debug log
 
         if (token) {
-          const decode = jwtDecode(token);
-          setUserId(decode?.sub ?? "");
+          const decode = jwtDecode(token) as any;
+          console.log("Decoded token:", decode); // Debug log
+          
+          const extractedUserId = decode?.sub || decode?.userId || decode?.id;
+          
+          if (extractedUserId) {
+            setUserId(String(extractedUserId));
+            console.log("Set userId:", extractedUserId); // Debug log
+          } else {
+            console.log("No userId found in token"); // Debug log
+            setUserId("");
+          }
+        } else {
+          console.log("No access token found"); // Debug log
+          setUserId("");
         }
       } catch (error) {
         console.error("Error decoding token:", error);
         setUserId("");
+        
+        // Optionally show alert for token issues
+        Alert.alert(
+          "Authentication Error", 
+          "There was an issue with your login session. Please login again.",
+          [{ text: "OK" }]
+        );
       }
     };
 
@@ -81,27 +106,90 @@ const Payment = () => {
 
 
   const handlePayment = async () => {
+    // Validate userId before proceeding
+    if (!userId || userId.trim() === "") {
+      Alert.alert(
+        "Authentication Required",
+        "Please login first to proceed with payment.",
+        [
+          { text: "Login", onPress: () => router.push('/Login') },
+          { text: "Cancel" }
+        ]
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
+      console.log("Payment attempt with userId:", userId); // Debug log
+      
       const formData = new FormData();
       formData.append('UserId', userId);
       formData.append('PackageId', String(packageData.id));
-      formData.append('FrontEndUrl', FRONTEND_URL);
+      // Use mobile deep link as primary callback
+      formData.append('FrontEndUrl', MOBILE_CALLBACK_URL);
+      // Add fallback URLs for better compatibility
+      // formData.append('FallbackUrl', WEB_FALLBACK_URL);
+      // formData.append('UniversalLink', UNIVERSAL_LINK);
       formData.append('Method', '2');
+      // formData.append('Platform', Platform.OS);
 
       const response = await createPayment(formData).unwrap();
       console.log("Payment response:", response);
+      
       const paymentUrl = response?.data?.paymentUrl;
       if (paymentUrl) {
-        await Linking.openURL(paymentUrl);
+        // Check if URL can be opened
+        const supported = await Linking.canOpenURL(paymentUrl);
+        if (supported) {
+          await Linking.openURL(paymentUrl);
+          
+          // Set up a fallback mechanism in case deep link doesn't work
+          const fallbackTimer = setTimeout(() => {
+            Alert.alert(
+              "Payment Processing",
+              "If the payment page doesn't load, please return to the app manually.",
+              [
+                { text: "Check Payment Status", onPress: () => checkPaymentStatus() },
+                { text: "OK" }
+              ]
+            );
+          }, 3000);
+          
+          // Clear timer if user returns to app
+          const subscription = Linking.addEventListener('url', () => {
+            clearTimeout(fallbackTimer);
+          });
+          
+          return () => subscription.remove();
+        } else {
+          throw new Error('Cannot open payment URL');
+        }
       } else {
-        router.push({ pathname: '/PaymentResult', params: { status: 'failed' } });
+        throw new Error('No payment URL received');
       }
     } catch (error) {
-      router.push({ pathname: '/PaymentResult', params: { status: 'failed' } });
+      console.error('Payment error:', error);
+      
+      // Check if it's a userId validation error from backend
+      const errorMessage = (error as any)?.data?.message || (error as any)?.message || "Unable to process payment";
+      
+      Alert.alert(
+        "Payment Error",
+        errorMessage,
+        [
+          { text: "Retry", onPress: () => handlePayment() },
+          { text: "Cancel", onPress: () => router.push({ pathname: '/PaymentResult', params: { status: 'failed' } }) }
+        ]
+      );
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const checkPaymentStatus = () => {
+    // Navigate to a payment status check page or show current status
+    router.push({ pathname: '/PaymentResult', params: { status: 'pending' } });
   };
 
   return (
