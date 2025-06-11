@@ -1,3 +1,5 @@
+import { UserProfile } from '@/features/userProfile/types'
+
 export type ReviewResult = {
   id: number
   userId: string
@@ -14,4 +16,17 @@ export type PostReviewRequest = {
     rating: number
     comment: string
   }
+}
+
+export type ReviewListResponse = {
+  userId: string
+  packageId: number
+  clueId: number
+  rating: number
+  comment: string
+  createdAt: string
+  clue: any
+  // user: UserProfile
+  package: any
+  id: number
 }

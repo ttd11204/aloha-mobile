@@ -1,10 +1,5 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import ReviewList from '@/features/review/components/ReviewList'
 
 export default function Review() {
-  return (
-    <View>
-      <Text>Review</Text>
-    </View>
-  )
+  return <ReviewList />
 }

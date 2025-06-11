@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import { useAppSelector } from '@/store/hooks'
-import { usePostReviewMutation } from '@/features/clue/api/reviewApi'
+import { usePostReviewMutation } from '@/features/review/api/reviewApi'
 
 type ClueModalProps = {
   clueId: number
