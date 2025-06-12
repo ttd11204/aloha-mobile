@@ -26,7 +26,7 @@ export type ReviewListResponse = {
   comment: string
   createdAt: string
   clue: any
-  // user: UserProfile
+  userName: string
   package: any
   id: number
 }

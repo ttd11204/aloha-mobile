@@ -45,22 +45,22 @@ const ReviewList: React.FC = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Có lỗi xảy ra khi tải dữ liệu</Text>
-        <Text style={styles.errorDetail}>Vui lòng thử lại sau</Text>
+        <Text style={styles.errorText}>Something wrong</Text>
+        <Text style={styles.errorDetail}>Please try again</Text>
       </View>
     )
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Danh sách đánh giá</Text>
+      <Text style={styles.header}>Review list</Text>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {!rvList || rvList.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Chưa có đánh giá nào</Text>
+            <Text style={styles.emptyText}>Nothing here yet</Text>
           </View>
         ) : (
           rvList.map((review) => (
@@ -68,9 +68,7 @@ const ReviewList: React.FC = () => {
               <View style={styles.reviewHeader}>
                 <View style={styles.reviewInfo}>
                   <Text style={styles.clueId}>Clue: {review.clueId}</Text>
-                  <Text style={styles.userId}>
-                    User: {review.userId.substring(0, 8)}...
-                  </Text>
+                  <Text style={styles.userId}>User: {review.userName}</Text>
                 </View>
                 <View style={styles.ratingContainer}>
                   <View style={styles.stars}>{renderStars(review.rating)}</View>
