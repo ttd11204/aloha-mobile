@@ -88,19 +88,63 @@ export default function HomePage() {
   const packages = pks || [];
   const router = useRouter();
 
-  const renderPackage = ({ item }: { item: Package }) => (
-    <TouchableOpacity
-      style={styles.packageCard}
-      onPress={() => {
-        console.log('Package ID:', item.id);
-        router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
-      }}
-    >
-      <Text style={styles.packageName}>{item.name}</Text>
-      <View style={styles.button}>
-        <Text style={styles.buttonText}>Buy now</Text>
-      </View>
-    </TouchableOpacity>
+  const getPackageDisplayName = (item: Package) => {
+    if (item.description.toLowerCase().includes('annual')) {
+      return 'Explorer Package';
+    } else if (item.description.toLowerCase().includes('15 days') || item.description.toLowerCase().includes('days')) {
+      return 'Adventure Package';
+    }
+    return item.name;
+  };
+  const isPopular = (item: Package, index: number) => {
+    return index === 0 || item.description.toLowerCase().includes('annual');
+  };
+  const renderPackage = ({ item, index }: { item: Package, index: number }) => (
+    <View style={styles.packageCardContainer}>
+      <TouchableOpacity
+        style={[
+          styles.packageCard,
+          isPopular(item, index) && styles.popularPackageCard
+        ]}
+        onPress={() => {
+          console.log('Package ID:', item.id);
+          router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
+        }}
+      >
+        {/* Popular Badge */}
+        {isPopular(item, index) && (
+          <View style={styles.popularBadge}>
+            <Text style={styles.popularBadgeText}>Popular</Text>
+          </View>
+        )}
+        
+        {/* Package Name */}
+        <Text style={styles.packageName}>
+          {getPackageDisplayName(item)}
+        </Text>
+        
+        {/* Duration */}
+        <Text style={styles.packageDuration}>
+          7 days
+        </Text>
+        
+        {/* Price */}
+        <Text style={styles.packagePrice}>
+          ${item.price}
+        </Text>
+        
+        {/* Buy Now Button */}
+        <TouchableOpacity 
+          style={styles.buyButton}
+          onPress={() => {
+            console.log('Package ID:', item.id);
+            router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
+          }}
+        >
+          <Text style={styles.buyButtonText}>Buy now</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 
   const renderDestination = ({ item }: { item: PackageApiResponse }) => (
@@ -149,18 +193,24 @@ export default function HomePage() {
       <View
         style={{
           flex: 1,
-          justifyContent: 'space-evenly',
+          justifyContent: 'center',
           alignItems: 'center',
+          paddingHorizontal: 10,
         }}
       >
         <FlatList
-          style={{ alignSelf: 'auto' }}
+          style={{ alignSelf: 'stretch' }}
           data={packages}
           horizontal
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderPackage}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
-          ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
+          contentContainerStyle={{ 
+            paddingHorizontal: 10,
+            justifyContent: 'center',
+            flexGrow: 1
+          }}
+          ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+          showsHorizontalScrollIndicator={false}
         />
       </View>
 
@@ -178,6 +228,7 @@ export default function HomePage() {
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderDestination}
         contentContainerStyle={{ paddingHorizontal: 10 }}
+        
       />
 
       {/* Challenges */}
@@ -251,25 +302,100 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'center',
   },
+  packageCardContainer: {
+    marginHorizontal: 4,
+  },
+  packageCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+    borderRadius: 12,
+    padding: 12,
+    width: 160,
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  popularPackageCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+    borderRadius: 12,
+    padding: 12,
+    width: 160,
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: 6,
+    left: 6,
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 12,
+    zIndex: 1,
+  },
+  popularBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  packageName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 4,
+    marginTop: 12,
+  },
+  packageDuration: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  packagePrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  buyButton: {
+    backgroundColor: '#1F2937',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginHorizontal: 10,
     marginVertical: 12,
     color: '#3B2C04',
-  },
-  packageCard: {
-    backgroundColor: '#e0f7ff',
-    padding: 10,
-    borderRadius: 10,
-    marginRight: 10,
-    width: 160,
-    alignItems: 'center',
-    // marginHorizontal: 15
-  },
-  packageName: {
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
   destinationCard: {
     width: 160,

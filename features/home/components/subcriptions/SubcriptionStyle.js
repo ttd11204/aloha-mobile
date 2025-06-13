@@ -48,6 +48,7 @@ export const newsletterStyles = StyleSheet.create({
   newsletterButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  
   },
   newsletterFooter: {
     fontSize: 11,
