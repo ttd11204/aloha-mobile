@@ -31,7 +31,9 @@ export const clueApi = createApi({
       { userId: string; cityId: number }
     >({
       query: ({ userId, cityId }) => `Clue/GetCluesForCity/${userId}/${cityId}`,
-      providesTags: ['Clue']
+      providesTags: (result, error, { userId, cityId }) => [
+        { type: 'Clue', id: `USERCLUES-${userId}-${cityId}` }
+      ]
     }),
 
     postClue: builder.mutation<
@@ -44,7 +46,8 @@ export const clueApi = createApi({
         body: { clueId, answer, userId }
       }),
       invalidatesTags: (result, error, { userId, cityId }) => [
-        { type: 'UserProgress', id: `RANK-${userId}-${cityId}` }
+        { type: 'UserProgress', id: `RANK-${userId}-${cityId}` },
+        { type: 'Clue', id: `USERCLUES-${userId}-${cityId}` }
       ]
     })
   })
