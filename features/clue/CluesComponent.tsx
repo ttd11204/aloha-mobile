@@ -69,8 +69,12 @@ const CluesComponent = () => {
   }
 
   const verifyCode = async () => {
-    if (!selectedClue || !cityClues || !userId) {
-      setError('Missing required data.')
+    if (!userId) {
+      setError('Please log in before playing.')
+      return
+    }
+    if (!selectedClue || !cityClues) {
+      setError('Missing required data. Please try again.')
       return
     }
 
