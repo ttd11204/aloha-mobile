@@ -11,7 +11,7 @@ import { createApi } from '@reduxjs/toolkit/query/react'
 export const clueApi = createApi({
   reducerPath: 'clueApi',
   baseQuery: baseQueryWithErrorHandling,
-  tagTypes: ['Clue'],
+  tagTypes: ['Clue', 'UserProgress'],
   endpoints: (builder) => ({
     // Get all clues
     getClues: builder.query<ClueData[], void>({
@@ -36,14 +36,16 @@ export const clueApi = createApi({
 
     postClue: builder.mutation<
       ResponseData<PostClueResponse>,
-      { clueId: number; answer: string; userId: string }
+      { clueId: number; answer: string; userId: string; cityId: number }
     >({
-      query: (clue) => ({
+      query: ({ clueId, answer, userId }) => ({
         url: 'Clue',
         method: 'POST',
-        body: clue
+        body: { clueId, answer, userId }
       }),
-      invalidatesTags: ['Clue']
+      invalidatesTags: (result, error, { userId, cityId }) => [
+        { type: 'UserProgress', id: `RANK-${userId}-${cityId}` }
+      ]
     })
   })
 })
