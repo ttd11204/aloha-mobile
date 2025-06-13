@@ -1,11 +1,13 @@
+import React from 'react'
 import ChatScreen from '@/features/chat/components/ChatScreen'
-import { View } from 'react-native'
+import { StatusBar } from 'react-native'
 import './global.css'
 
 export default function ChatPage() {
   return (
-    <View className="flex-1">
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="#0095ff" />
       <ChatScreen />
-    </View>
+    </>
   )
 } 

@@ -2,13 +2,22 @@ import { baseQueryWithErrorHandling } from '@/lib/baseApi'
 import { createApi } from '@reduxjs/toolkit/query/react'
 
 export interface AddFriendRequest {
-  email: string
+  userId: string
+  targetEmail: string
 }
 
 export interface AddFriendResponse {
-  success: boolean
   message: string
-  data?: any
+}
+
+export interface RespondFriendRequest {
+  userId: string
+  requestId: string
+  accepted: boolean
+}
+
+export interface RespondFriendResponse {
+  message: string
 }
 
 export interface FriendRequest {
@@ -45,9 +54,10 @@ export const chatApi = createApi({
   endpoints: (builder) => ({
     // Add friend by email
     addFriend: builder.mutation<AddFriendResponse, AddFriendRequest>({
-      query: ({ email }) => ({
-        url: `User/addfriend/${email}`,
-        method: 'POST'
+      query: (body) => ({
+        url: 'User/friend-request',
+        method: 'POST',
+        body
       }),
       invalidatesTags: ['Friend', 'FriendRequest']
     }),
@@ -59,13 +69,11 @@ export const chatApi = createApi({
     }),
 
     // Accept/Reject friend request
-    respondToFriendRequest: builder.mutation<
-      { success: boolean }, 
-      { requestId: string; action: 'accept' | 'reject' }
-    >({
-      query: ({ requestId, action }) => ({
-        url: `User/friendrequest/${requestId}/${action}`,
-        method: 'POST'
+    respondToFriendRequest: builder.mutation<RespondFriendResponse, RespondFriendRequest>({
+      query: (body) => ({
+        url: 'User/respond-friend-request',
+        method: 'POST',
+        body
       }),
       invalidatesTags: ['Friend', 'FriendRequest']
     }),

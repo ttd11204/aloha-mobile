@@ -11,7 +11,9 @@ import {
   ActivityIndicator,
   Modal,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Animated,
+  Dimensions
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons'
@@ -24,11 +26,78 @@ import {
   useGetFriendRequestsQuery 
 } from '../api/chatApi'
 
+// Custom Toast Component
+interface ToastProps {
+  visible: boolean
+  message: string
+  type: 'success' | 'error'
+  onHide: () => void
+}
+
+const Toast: React.FC<ToastProps> = ({ visible, message, type, onHide }) => {
+  const translateY = new Animated.Value(-100)
+
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.delay(3000),
+        Animated.timing(translateY, {
+          toValue: -100,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => onHide())
+    }
+  }, [visible])
+
+  if (!visible) return null
+
+  return (
+    <Animated.View 
+      style={{
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        right: 20,
+        zIndex: 9999,
+        transform: [{ translateY }],
+      }}
+    >
+      <View className={`rounded-xl p-4 flex-row items-center shadow-lg ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      }`}>
+        <Ionicons 
+          name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} 
+          size={24} 
+          color="white" 
+        />
+        <Text className="text-white font-medium ml-3 flex-1">{message}</Text>
+      </View>
+    </Animated.View>
+  )
+}
+
 export default function ChatScreen() {
   const [searchEmail, setSearchEmail] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [showAddFriendModal, setShowAddFriendModal] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  
+  // Toast state
+  const [toast, setToast] = useState<{
+    visible: boolean
+    message: string
+    type: 'success' | 'error'
+  }>({
+    visible: false,
+    message: '',
+    type: 'success'
+  })
 
   const [addFriend, { isLoading: addingFriend }] = useAddFriendMutation()
   const { data: friends = [], isLoading: loadingFriends } = useGetFriendsQuery(userId || '', {
@@ -53,42 +122,62 @@ export default function ChatScreen() {
     getUserId()
   }, [])
 
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ visible: true, message, type })
+  }
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, visible: false }))
+  }
+
   const handleAddFriend = async () => {
     if (!searchEmail.trim()) {
-      Alert.alert('Error', 'Please enter an email address')
+      showToast('Please enter an email address', 'error')
       return
     }
 
     if (!userId) {
-      Alert.alert('Error', 'You need to be logged in to add friends')
+      showToast('You need to be logged in to add friends', 'error')
       return
     }
 
     setIsSearching(true)
     
+    const requestData = { 
+      userId: userId,
+      targetEmail: searchEmail.trim().toLowerCase() 
+    }
+    
     try {
-      const result = await addFriend({ email: searchEmail.trim().toLowerCase() }).unwrap()
+      const result = await addFriend(requestData).unwrap()
       
-      if (result.success) {
-        Alert.alert('Success', 'Friend request sent successfully!')
-        setSearchEmail('')
-        setShowAddFriendModal(false)
-      } else {
-        Alert.alert('Failed', result.message || 'Failed to send friend request')
-      }
+      showToast(result.message || 'Friend request sent successfully!', 'success')
+      setSearchEmail('')
+      setShowAddFriendModal(false)
     } catch (error: any) {
-      console.error('Add friend error:', error)
+      console.error('Friend request failed:', {
+        status: error.status,
+        data: error.data,
+        email: searchEmail
+      })
       
-      // Handle different error cases
+      // Handle different error cases with custom toast
+      let errorMessage = 'Something went wrong. Please try again later.'
+      
       if (error.status === 404) {
-        Alert.alert('User Not Found', 'No user found with this email address')
+        errorMessage = 'No user found with this email address'
       } else if (error.status === 400) {
-        Alert.alert('Invalid Request', 'Cannot send friend request to this user')
+        errorMessage = 'Cannot send friend request to this user'
       } else if (error.status === 409) {
-        Alert.alert('Already Friends', 'You are already friends with this user')
-      } else {
-        Alert.alert('Error', 'Something went wrong. Please try again later.')
+        errorMessage = 'You are already friends with this user'
+      } else if (error.status === 401) {
+        errorMessage = 'You need to login again'
+      } else if (error.data?.message) {
+        errorMessage = error.data.message
       }
+      
+      showToast(errorMessage, 'error')
+      setShowAddFriendModal(false)
     } finally {
       setIsSearching(false)
     }
@@ -101,15 +190,24 @@ export default function ChatScreen() {
   ]
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <StatusBar barStyle="light-content" backgroundColor="#0095ff" />
       
-      {/* Header */}
+      {/* Toast Notification */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
+      
+      {/* Header with proper status bar spacing */}
       <LinearGradient
         colors={['#0095ff', '#0080e6']}
         className="pb-4"
+        style={{ paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight || 24 + 20 }}
       >
-        <View className="flex-row items-center justify-between px-4 pt-4">
+        <View className="flex-row items-center justify-between px-4">
           <View className="flex-row items-center">
             <TouchableOpacity onPress={() => router.back()} className="mr-3">
               <Ionicons name="arrow-back" size={24} color="white" />
@@ -130,17 +228,17 @@ export default function ChatScreen() {
       {friendRequests.length > 0 && (
         <View className="bg-blue-50 px-4 py-3 border-b border-gray-200">
           <Text className="text-blue-600 font-medium mb-2">Friend Requests ({friendRequests.length})</Text>
-                     <TouchableOpacity 
-             onPress={() => {
-               // TODO: Implement Friend Requests screen
-               Alert.alert('Coming Soon', 'Friend requests feature will be available soon!')
-             }}
-             className="flex-row items-center"
-           >
-             <Ionicons name="people" size={20} color="#3b82f6" />
-             <Text className="text-blue-600 ml-2">View all requests</Text>
-             <Ionicons name="chevron-forward" size={16} color="#3b82f6" className="ml-1" />
-           </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => {
+              // TODO: Implement Friend Requests screen
+              showToast('Friend requests feature will be available soon!', 'success')
+            }}
+            className="flex-row items-center"
+          >
+            <Ionicons name="people" size={20} color="#3b82f6" />
+            <Text className="text-blue-600 ml-2">View all requests</Text>
+            <Ionicons name="chevron-forward" size={16} color="#3b82f6" className="ml-1" />
+          </TouchableOpacity>
         </View>
       )}
 
@@ -157,10 +255,10 @@ export default function ChatScreen() {
               <TouchableOpacity 
                 key={friend.id}
                 className="flex-row items-center py-4 border-b border-gray-100"
-                                 onPress={() => {
-                   // TODO: Implement Chat Conversation screen
-                   Alert.alert('Chat', `Start conversation with ${friend.name}`)
-                 }}
+                onPress={() => {
+                  // TODO: Implement Chat Conversation screen
+                  showToast(`Start conversation with ${friend.name}`, 'success')
+                }}
               >
                 <View className="w-12 h-12 bg-blue-100 rounded-full items-center justify-center mr-3">
                   <Text className="text-2xl">{friend.avatar}</Text>
@@ -231,8 +329,9 @@ export default function ChatScreen() {
               <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
                 <MaterialIcons name="email" size={20} color="#6b7280" />
                 <TextInput
-                  className="flex-1 ml-3 text-base"
+                  className="flex-1 ml-3 text-base text-black"
                   placeholder="friend@example.com"
+                  placeholderTextColor="#9ca3af"
                   value={searchEmail}
                   onChangeText={setSearchEmail}
                   keyboardType="email-address"
@@ -266,6 +365,6 @@ export default function ChatScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+    </View>
   )
 } 
