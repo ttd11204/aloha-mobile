@@ -1,7 +1,5 @@
-
-
-
 export interface Marker {
+  clueId: number
   position: [number, number]
   radius: number
   color: string
@@ -15,6 +13,6 @@ export interface Location {
   markers: Marker[]
 }
 
-export type LocationKey = 'HCMC' | 'HANOI' | 'DANANG' | 'DALAT' | 'NINHBINH'
+export type LocationKey = 'DANANG'
 
 export type LocationMap = Record<LocationKey, Location>

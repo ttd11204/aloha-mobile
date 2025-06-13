@@ -54,6 +54,7 @@ const ClueModal: React.FC<ClueModalProps> = ({
       setRating(0)
       onClose()
     } catch (error) {
+      // console.error('Review submit error:', error)
       Alert.alert('Error', 'Failed to submit review. Please try again.')
     } finally {
       setIsSubmitting(false)

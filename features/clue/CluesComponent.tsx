@@ -91,7 +91,8 @@ const CluesComponent = () => {
         const res = await postClue({
           clueId: selectedClueData.id,
           answer: verificationCode,
-          userId
+          userId,
+          cityId: 1
         }).unwrap()
         setTimeout(() => {
           setShowReviewPopup(true)
