@@ -30,7 +30,18 @@ const ReviewList: React.FC = () => {
   }
 
   const generateRandomTags = (): string[] => {
-    const allTags = ['Confusing', 'Wordplay', 'Easy', 'Tricky', 'Fun', 'Creative', 'Challenging', 'Clever', 'Difficult', 'Interesting']
+    const allTags = [
+      'Confusing',
+      'Wordplay',
+      'Easy',
+      'Tricky',
+      'Fun',
+      'Creative',
+      'Challenging',
+      'Clever',
+      'Difficult',
+      'Interesting'
+    ]
     const numTags = Math.floor(Math.random() * 3) + 1 // 1-3 tags
     const shuffled = allTags.sort(() => 0.5 - Math.random())
     return shuffled.slice(0, numTags)
@@ -51,7 +62,7 @@ const ReviewList: React.FC = () => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Đang tải đánh giá...</Text>
+        <Text style={styles.loadingText}>Loading reviews...</Text>
       </View>
     )
   }
@@ -90,7 +101,11 @@ const ReviewList: React.FC = () => {
                   <View style={styles.userInfo}>
                     <Text style={styles.userName}>{review.userName}</Text>
                     <View style={styles.dateAndClue}>
-                      <Ionicons name="calendar-outline" size={12} color="#999" />
+                      <Ionicons
+                        name="calendar-outline"
+                        size={12}
+                        color="#999"
+                      />
                       <Text style={styles.createdAt}>
                         {formatDate(review.createdAt)}
                       </Text>
@@ -119,14 +134,18 @@ const ReviewList: React.FC = () => {
               <View style={styles.actionBar}>
                 <TouchableOpacity style={styles.actionButton}>
                   <Ionicons name="thumbs-up-outline" size={16} color="#666" />
-                  <Text style={styles.actionText}>{Math.floor(Math.random() * 20) + 1}</Text>
+                  <Text style={styles.actionText}>
+                    {Math.floor(Math.random() * 20) + 1}
+                  </Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity style={styles.actionButton}>
                   <Ionicons name="chatbubble-outline" size={16} color="#666" />
-                  <Text style={styles.actionText}>{Math.floor(Math.random() * 15) + 1}</Text>
+                  <Text style={styles.actionText}>
+                    {Math.floor(Math.random() * 15) + 1}
+                  </Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity style={styles.actionButton}>
                   <Ionicons name="share-outline" size={16} color="#666" />
                   <Text style={styles.actionText}>Share</Text>
