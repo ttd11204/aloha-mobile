@@ -5,15 +5,15 @@ import sharedStyles from '../HomeStyles';
 
 const challenges = [
   {
-    icon: 'puzzle-piece',
-    title: 'Hoi An Ancient Town',
-    description: 'Solve the lantern riddle',
+    icon: 'mountain',
+    title: 'Ngu Hanh Son',
+    description: 'Explore the hidden temples in the caves',
     rating: '4.8 ★',
   },
   {
-    icon: 'mountain',
-    title: 'Ha Long Bay',
-    description: 'Find the hidden cave',
+    icon: 'dragon',
+    title: 'Dragon Bridge',
+    description: 'Witness the weekend fire and water show',
     rating: '4.7 ★',
   },
 ];
