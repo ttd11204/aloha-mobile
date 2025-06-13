@@ -108,19 +108,6 @@ export default function TabLayout() {
             )
           }}
         />
-        {/* <Tabs.Screen
-          name="Status"
-          options={{
-            title: 'Status',
-            tabBarIcon: ({ color }) => (
-              <FontAwesome name="user" size={24} color={color} />
-            )
-          }}
-        />
-        <Tabs.Screen
-          name="leaderboard"
-          options={{ title: 'Leaderboard', tabBarButton: () => null }}
-        /> */}
       </Tabs>
     </>
   )

@@ -27,9 +27,21 @@ export const userProgressApi = createApi({
       providesTags: (result, error, { userId, cityId }) => [
         { type: 'UserProgress', id: `RANK-${userId}-${cityId}` }
       ]
+    }),
+
+    // Get user image
+    getUserImage: builder.query<
+      ResponseData<string[]>,
+      { userId: string; cityId: number }
+    >({
+      query: ({ userId, cityId }) =>
+        `/UserProgress/user/${userId}/city/${cityId}/images`
     })
   })
 })
 
-export const { useGetTop3UserByCityIdQuery, useGetUserRankInCityQuery } =
-  userProgressApi
+export const {
+  useGetTop3UserByCityIdQuery,
+  useGetUserRankInCityQuery,
+  useGetUserImageQuery
+} = userProgressApi
