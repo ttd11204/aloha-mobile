@@ -14,9 +14,7 @@ import { skipToken } from '@reduxjs/toolkit/query'
 
 export default function Memory() {
   const cityId = 1
-  const userId =
-    useAppSelector((state) => state.auth.userId) ||
-    '53dd1896-fbe2-40b7-9513-cce1f0d6eaa0' // Default userId for testing
+  const userId = useAppSelector((state) => state.auth.userId)
 
   const { data, isLoading, error } = useGetUserImageQuery(
     userId ? { userId, cityId } : skipToken
