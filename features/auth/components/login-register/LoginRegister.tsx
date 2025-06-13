@@ -15,6 +15,7 @@ import {
 } from 'react-native'
 import { useLoginMutation, useRegisterMutation } from '../../api/authApi'
 import { setCredentials } from '../../slice/authSlice'
+import LoginSuccessModal from '../login-success-modal/LoginSuccessModal'
 
 interface CustomJwtPayload extends JwtPayload {
   sub: string
@@ -35,6 +36,8 @@ export default function LoginRegister() {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [userFullName, setUserFullName] = useState('')
 
   const rememberMe = true
   const [login] = useLoginMutation()
@@ -55,8 +58,11 @@ export default function LoginRegister() {
           refreshToken: result.message.data.accessToken
         })
       )
-      Alert.alert('Login Successfully', 'Welcome to Aloha.')
-      router.push('/')
+      setUserFullName(result.message.data.fullName || 'Aloha')
+      setShowSuccessModal(true)
+// router.push('/') // chuyển router.push sang sau khi đóng modal
+      // Alert.alert('Login Successfully', 'Welcome to Aloha.')
+      // router.push('/')
     } catch (error: any) {
       Alert.alert('Login Failed', error?.data?.title || 'Invalid credentials')
     } finally {
@@ -324,6 +330,14 @@ export default function LoginRegister() {
           {isLogin ? <LoginForm /> : <RegisterForm />}
         </View>
       </ScrollView>
+      <LoginSuccessModal
+        visible={showSuccessModal}
+        onClose={() => {
+        setShowSuccessModal(false)
+        router.push('/')
+      }}
+      userName={userFullName}
+    />
     </KeyboardAvoidingView>
   )
 }

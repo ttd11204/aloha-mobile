@@ -1,8 +1,8 @@
-import Icon from '@react-native-vector-icons/fontawesome';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Plane } from 'lucide-react-native';
-import React from 'react';
+import Icon from '@react-native-vector-icons/fontawesome'
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Plane } from 'lucide-react-native'
+import React from 'react'
 import {
   Alert,
   FlatList,
@@ -12,18 +12,18 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-} from 'react-native';
+  View
+} from 'react-native'
 
-import { useGetPackageDataQuery } from '@/components/api/packageApi';
-import { useRouter } from 'expo-router';
-import ImageSlider from './components/HomeSlider';
-import PopularChallenges from './components/PopularChallenges';
-import Testimonials from './components/Testimonials';
-import NearbyEvents from './components/event/Event';
-import AlohaRewards from './components/reward/Reward';
-import NewsletterSubscription from './components/subcriptions/Subcriptions';
-import { Package } from './types';
+import { useGetPackageDataQuery } from '@/components/api/packageApi'
+import { useRouter } from 'expo-router'
+import ImageSlider from './components/HomeSlider'
+import PopularChallenges from './components/PopularChallenges'
+import Testimonials from './components/Testimonials'
+import NearbyEvents from './components/event/Event'
+import AlohaRewards from './components/reward/Reward'
+import NewsletterSubscription from './components/subcriptions/Subcriptions'
+import { Package } from './types'
 
 const featuredDestinations = [
   {
@@ -32,7 +32,9 @@ const featuredDestinations = [
     challenges: 5,
     rating: 4.9,
     isNew: true,
-    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
+    image: {
+      uri: 'https://res.cloudinary.com/dtjgueyp2/image/upload/fl_preserve_transparency/v1749824469/des1_yqlxyv.jpg?_s=public-apps'
+    }
   },
   {
     name: 'Marble Mountains',
@@ -40,7 +42,9 @@ const featuredDestinations = [
     challenges: 8,
     rating: 4.7,
     isNew: false,
-    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
+    image: {
+      uri: 'https://res.cloudinary.com/dtjgueyp2/image/upload/fl_preserve_transparency/v1749824473/des2_bd35bx.jpg?_s=public-apps'
+    }
   },
   {
     name: 'Dragon Bridge',
@@ -48,7 +52,9 @@ const featuredDestinations = [
     challenges: 3,
     rating: 4.6,
     isNew: true,
-    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
+    image: {
+      uri: 'https://res.cloudinary.com/dtjgueyp2/image/upload/fl_preserve_transparency/v1749824470/des3_dqo4on.jpg?_s=public-apps'
+    }
   },
   {
     name: 'Ba Na Hills',
@@ -56,52 +62,101 @@ const featuredDestinations = [
     challenges: 6,
     rating: 4.8,
     isNew: false,
-    image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
-  },
+    image: {
+      uri: 'https://res.cloudinary.com/dtjgueyp2/image/upload/fl_preserve_transparency/v1749824469/des4_ewotp6.jpg?_s=public-apps'
+    }
+  }
   // ... other destinations
-];
+]
 
 type PackageApiResponse = {
-  image: ImageSourcePropType;
-  name: string;
-  location: string;
-  challenges: number;
-  rating: number;
-  isNew: boolean;
-};
+  image: ImageSourcePropType
+  name: string
+  location: string
+  challenges: number
+  rating: number
+  isNew: boolean
+}
 type RootStackParamList = {
-  Home: undefined;
-  PackageDetail: { id: string };
-  AnnualPayment: undefined;
-  DaysPayment: undefined;
+  Home: undefined
+  PackageDetail: { id: string }
+  AnnualPayment: undefined
+  DaysPayment: undefined
   // Add other routes here if needed
-};
+}
 
 export default function HomePage() {
   const {
     data: pks,
     isLoading: pksLoading,
-    isFetching: pksFetch,
-  } = useGetPackageDataQuery();
+    isFetching: pksFetch
+  } = useGetPackageDataQuery()
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const packages = pks || [];
-  const router = useRouter();
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const packages = pks || []
+  const router = useRouter()
 
-  const renderPackage = ({ item }: { item: Package }) => (
-    <TouchableOpacity
-      style={styles.packageCard}
-      onPress={() => {
-        console.log('Package ID:', item.id);
-        router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
-      }}
-    >
-      <Text style={styles.packageName}>{item.name}</Text>
-      <View style={styles.button}>
-        <Text style={styles.buttonText}>Buy now</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const getPackageDisplayName = (item: Package) => {
+    if (item.description.toLowerCase().includes('annual')) {
+      return 'Explorer Package'
+    } else if (
+      item.description.toLowerCase().includes('15 days') ||
+      item.description.toLowerCase().includes('days')
+    ) {
+      return 'Adventure Package'
+    }
+    return item.name
+  }
+  const isPopular = (item: Package, index: number) => {
+    return index === 0 || item.description.toLowerCase().includes('annual')
+  }
+  const renderPackage = ({ item, index }: { item: Package; index: number }) => (
+    <View style={styles.packageCardContainer}>
+      <TouchableOpacity
+        style={[
+          styles.packageCard,
+          isPopular(item, index) && styles.popularPackageCard
+        ]}
+        onPress={() => {
+          console.log('Package ID:', item.id)
+          router.push({
+            pathname: '/Payment',
+            params: { id: item.id.toString() }
+          })
+        }}
+      >
+        {/* Popular Badge */}
+        {isPopular(item, index) && (
+          <View style={styles.popularBadge}>
+            <Text style={styles.popularBadgeText}>Popular</Text>
+          </View>
+        )}
+
+        {/* Package Name */}
+        <Text style={styles.packageName}>{getPackageDisplayName(item)}</Text>
+
+        {/* Duration */}
+        <Text style={styles.packageDuration}>7 days</Text>
+
+        {/* Price */}
+        <Text style={styles.packagePrice}>${item.price}</Text>
+
+        {/* Buy Now Button */}
+        <TouchableOpacity
+          style={styles.buyButton}
+          onPress={() => {
+            console.log('Package ID:', item.id)
+            router.push({
+              pathname: '/Payment',
+              params: { id: item.id.toString() }
+            })
+          }}
+        >
+          <Text style={styles.buyButtonText}>Buy now</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
+  )
 
   const renderDestination = ({ item }: { item: PackageApiResponse }) => (
     <View style={styles.destinationCard}>
@@ -109,21 +164,21 @@ export default function HomePage() {
       {item.isNew && <Text style={styles.newTag}>New</Text>}
       <Text style={styles.destinationTitle}>{item.name}</Text>
       <Text style={styles.destinationMeta}>
-        <Icon name='map-marker' size={12} /> {item.location}
+        <Icon name="map-marker" size={12} /> {item.location}
       </Text>
       <Text style={styles.destinationMeta}>
         {item.challenges} puzzles • {item.rating} ★
       </Text>
     </View>
-  );
+  )
 
   return (
-    <ScrollView className='bg-white pt-10'>
+    <ScrollView className="bg-white pt-10">
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Image
           source={
-            require('../../assets/Side_Image/halong.jpg') as ImageSourcePropType
+            require('../../assets/Side_Image/danang.jpg') as ImageSourcePropType
           }
           style={styles.heroImage}
         />
@@ -149,18 +204,24 @@ export default function HomePage() {
       <View
         style={{
           flex: 1,
-          justifyContent: 'space-evenly',
+          justifyContent: 'center',
           alignItems: 'center',
+          paddingHorizontal: 10
         }}
       >
         <FlatList
-          style={{ alignSelf: 'auto' }}
+          style={{ alignSelf: 'stretch' }}
           data={packages}
           horizontal
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderPackage}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
-          ItemSeparatorComponent={() => <View style={{ width: 15 }} />}
+          contentContainerStyle={{
+            paddingHorizontal: 10,
+            justifyContent: 'center',
+            flexGrow: 1
+          }}
+          ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+          showsHorizontalScrollIndicator={false}
         />
       </View>
 
@@ -205,71 +266,146 @@ export default function HomePage() {
         <NewsletterSubscription />
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   section: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 12
   },
   heroSection: {
     flexDirection: 'row',
     margin: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: 'hidden'
   },
   heroImage: {
     width: '50%',
-    height: 160,
+    height: 160
   },
   heroContent: {
     flex: 1,
     padding: 10,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   heroTitle: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 16
   },
   heroSubtitle: {
     color: '#555',
-    marginVertical: 8,
+    marginVertical: 8
   },
   button: {
     backgroundColor: '#0aaff1',
     padding: 10,
     borderRadius: 8,
-    alignSelf: 'auto',
+    alignSelf: 'auto'
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    alignSelf: 'center',
+    alignSelf: 'center'
+  },
+  packageCardContainer: {
+    marginHorizontal: 4
+  },
+  packageCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+    borderRadius: 12,
+    padding: 12,
+    width: 160,
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  popularPackageCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+    borderRadius: 12,
+    padding: 12,
+    width: 160,
+    alignItems: 'center',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 5
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: 6,
+    left: 6,
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 12,
+    zIndex: 1
+  },
+  popularBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '600'
+  },
+  packageName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 4,
+    marginTop: 12
+  },
+  packageDuration: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 8
+  },
+  packagePrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 12
+  },
+  buyButton: {
+    backgroundColor: '#1F2937',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    width: '100%',
+    alignItems: 'center'
+  },
+  buyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600'
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginHorizontal: 10,
     marginVertical: 12,
-    color: '#3B2C04',
-  },
-  packageCard: {
-    backgroundColor: '#e0f7ff',
-    padding: 10,
-    borderRadius: 10,
-    marginRight: 10,
-    width: 160,
-    alignItems: 'center',
-    // marginHorizontal: 15
-  },
-  packageName: {
-    fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#3B2C04'
   },
   destinationCard: {
     width: 160,
@@ -278,20 +414,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     padding: 5,
-    elevation: 2,
+    elevation: 2
   },
   destinationImage: {
     width: '100%',
     height: 90,
-    borderRadius: 8,
+    borderRadius: 8
   },
   destinationTitle: {
     fontWeight: 'bold',
-    marginTop: 6,
+    marginTop: 6
   },
   destinationMeta: {
     fontSize: 12,
-    color: '#555',
+    color: '#555'
   },
   newTag: {
     position: 'absolute',
@@ -302,6 +438,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 12,
-  },
-});
+    borderRadius: 12
+  }
+})

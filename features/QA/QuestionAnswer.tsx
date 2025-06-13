@@ -28,18 +28,18 @@ const MapComponent = () => {
 
   // Default region (fallback if location access is denied)
   const defaultRegion = {
-    latitude: 10.7769,
-    longitude: 106.7009,
+    latitude: 16.0544, 
+    longitude: 108.2022,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  };
+};
 
-  const region = location ? {
+const region = location ? {
     latitude: location.coords.latitude,
     longitude: location.coords.longitude,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  } : defaultRegion;
+} : defaultRegion;
 
   if (errorMsg) {
     return (
