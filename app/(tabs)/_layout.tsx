@@ -1,3 +1,4 @@
+import React from 'react'
 import Sidebar from '@/components/SideBar'
 import {
   AntDesign,
@@ -9,6 +10,7 @@ import {
 import { Tabs } from 'expo-router'
 import { useState } from 'react'
 import { Image, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const BLUE_TAB_COLOR = '#0095ff'
 const ACTIVE_ICON_COLOR = '#ffff00'
@@ -16,6 +18,7 @@ const INACTIVE_ICON_COLOR = '#ffffff'
 
 export default function TabLayout() {
   const [isSidebarVisible, setSidebarVisible] = useState(false)
+  const insets = useSafeAreaInsets()
 
   return (
     <>
@@ -24,14 +27,21 @@ export default function TabLayout() {
         onClose={() => setSidebarVisible(false)}
       />
 
-      <View className="h-20 bg-[#0095ff] px-5 py-4 mt-16">
-        <View className="flex-row items-center justify-between gap-3 pt-2">
+      {/* Safe area spacer */}
+      <View 
+        className="bg-[#0095ff]" 
+        style={{ height: insets.top }} 
+      />
+      
+      {/* Header */}
+      <View className="h-16 bg-[#0095ff] px-5 py-3">
+        <View className="flex-row items-center justify-between gap-3 pt-1">
           <TouchableOpacity onPress={() => setSidebarVisible(true)}>
             <Entypo name="menu" size={28} color="white" />
           </TouchableOpacity>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: 18,
               color: 'white',
               fontWeight: '600'
             }}
@@ -47,6 +57,8 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {
             backgroundColor: BLUE_TAB_COLOR,
+            paddingBottom: insets.bottom,
+            height: 60 + insets.bottom,
             ...(Platform.OS === 'android' && { position: 'absolute' })
           }
         }}

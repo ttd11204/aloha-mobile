@@ -6,19 +6,18 @@ import {
   SafeAreaView,
   StatusBar,
   Animated,
-  Dimensions,
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-
-const { width, height } = Dimensions.get('window');
+import { useResponsiveDesign } from '@/hooks/useResponsiveDesign';
 
 export default function LoginRequired() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const { height, safeAreaInsets, isSmallScreen } = useResponsiveDesign();
 
   useEffect(() => {
     Animated.parallel([

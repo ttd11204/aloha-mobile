@@ -2,7 +2,7 @@ import Icon from '@react-native-vector-icons/fontawesome'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Plane } from 'lucide-react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Alert,
   FlatList,
@@ -12,8 +12,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Modal,
+  Animated
 } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { MaterialIcons, Feather } from '@expo/vector-icons'
 
 import { useGetPackageDataQuery } from '@/components/api/packageApi'
 import { useRouter } from 'expo-router'
@@ -95,6 +99,7 @@ export default function HomePage() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const packages = pks || []
   const router = useRouter()
+  const [showStartModal, setShowStartModal] = useState(false)
 
   const getPackageDisplayName = (item: Package) => {
     if (item.description.toLowerCase().includes('annual')) {
@@ -191,8 +196,7 @@ export default function HomePage() {
           </Text>
           <TouchableOpacity
             style={styles.button}
-            // onPress={() => navigation.navigate('Clues')}
-            onPress={() => Alert.alert('Button Pressed', 'Start playing!')}
+            onPress={() => setShowStartModal(true)}
           >
             <Text style={styles.buttonText}>Start playing</Text>
           </TouchableOpacity>
@@ -265,6 +269,77 @@ export default function HomePage() {
       <View>
         <NewsletterSubscription />
       </View>
+
+      {/* Start Playing Modal */}
+      <Modal
+        transparent
+        visible={showStartModal}
+        animationType="fade"
+        onRequestClose={() => setShowStartModal(false)}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center px-6">
+          <View className="bg-white rounded-2xl p-6 w-full max-w-[350px] items-center">
+            {/* Icon */}
+            <LinearGradient
+              colors={['#3b82f6', '#06b6d4', '#10b981']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+              }}
+              className="items-center justify-center mb-6"
+            >
+              <MaterialIcons name="location-on" size={40} color="white" />
+            </LinearGradient>
+
+            {/* Title */}
+            <Text className="text-2xl font-bold text-gray-800 mb-2 text-center">
+              Ready to Explore?
+            </Text>
+            
+            {/* Description */}
+            <Text className="text-gray-600 text-center mb-6 text-base leading-6">
+              Complete the mission to unlock the next location and discover amazing experiences in Vietnam!
+            </Text>
+
+            {/* Buttons */}
+            <View className="w-full space-y-3">
+              <TouchableOpacity
+                onPress={() => {
+                  setShowStartModal(false)
+                  router.push('/Clue')
+                }}
+                className="bg-blue-500 rounded-xl py-4 items-center shadow-lg"
+                style={{
+                  shadowColor: '#3b82f6',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 12,
+                  elevation: 8,
+                }}
+              >
+                <View className="flex-row items-center">
+                  <Feather name="play" size={20} color="white" />
+                  <Text className="text-white text-lg font-semibold ml-2">
+                    Start Playing
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowStartModal(false)}
+                className="bg-gray-100 rounded-xl py-4 items-center"
+              >
+                <Text className="text-gray-600 text-base font-medium">
+                  Maybe Later
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   )
 }
