@@ -45,7 +45,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ route, navigation }) => {
   event = event || {
     title: 'Cultural Festival',
     description: 'Experience traditional dances and music.',
-    location: 'Hanoi',
+    location: 'Da Nang',
     distance: '2 km',
     status: 'Now',
     image: require('@/assets/Side_Image/puppet.jpg')
@@ -54,11 +54,11 @@ const EventDetails: React.FC<EventDetailsProps> = ({ route, navigation }) => {
   const eventDetails = {
     date: 'June 9, 2025',
     time: '6:00 PM - 10:00 PM',
-    fullLocation: 'Hoan Kiem Lake, Old Quarter, Hanoi',
-    organizer: 'Hanoi Cultural Heritage Center',
+    fullLocation: 'East Sea Park, Son Tra District, Da Nang',
+    organizer: 'Da Nang Department of Culture and Sports',
     price: 'Free',
     capacity: '500 people',
-    description: `Join us for an enchanting evening celebrating Vietnamese cultural heritage at the beautiful Hoan Kiem Lake. This spectacular cultural festival features traditional water puppetry performances, folk music concerts, and authentic dance presentations.
+    description: `Join us for an enchanting evening celebrating Vietnamese cultural heritage at the beautiful East Sea Park. This spectacular cultural festival features traditional music performances, folk games, and presentations of local coastal culture.
 
 Experience the rich tapestry of Vietnamese culture through:
 • Traditional water puppet shows every hour

@@ -8,7 +8,7 @@ const nearbyEvents = [
   {
     title: 'Cultural Festival',
     description: 'Experience traditional dances and music.',
-    location: 'Hanoi',
+    location: 'Da Nang',
     distance: '2 km',
     status: 'Now',
     image: require('@/assets/Side_Image/puppet.jpg')
@@ -16,7 +16,7 @@ const nearbyEvents = [
   {
     title: 'Vietnamese Cooking Class',
     description: 'Learn to make authentic phở and spring rolls',
-    location: 'Hanoi Cooking Centre',
+    location: 'Da Nang Cooking Centre',
     distance: '2.3 km away',
     status: 'Today',
     image: require('@/assets/Side_Image/cooking.jpg')
@@ -24,7 +24,7 @@ const nearbyEvents = [
   {
     title: 'Night Market Tour',
     description: 'Explore local street food and souvenirs',
-    location: 'Old Quarter',
+    location: 'Da Nang',
     distance: '0.8 km away',
     status: 'Tomorrow',
     image: require('@/assets/Side_Image/nightmarket.jpg')

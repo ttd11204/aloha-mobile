@@ -35,7 +35,17 @@ export default function RootLayout() {
       const url = event.url
       console.log('Received deep link:', url)
       
-      if (url.startsWith('aloha://payment-callback')) {
+      // Handle path-based payment callback URLs like: aloha://payment-callback/payment-status/
+      if (url.startsWith('aloha://payment-callback/payment-status/')) {
+        const status = url.split('/').pop() || 'success'
+        console.log('Payment callback status:', status)
+        
+        // Direct navigation to status-specific route - Expo Router will handle it
+        // The route files will then redirect to PaymentResult
+        return; // Let Expo Router handle the routing naturally
+      }
+      // Handle query-based payment callback URLs like: aloha://payment-callback?status=success
+      else if (url.startsWith('aloha://payment-callback')) {
         // Parse URL parameters more robustly
         const urlObj = new URL(url.replace('aloha://', 'https://dummy.com/'))
         const status = urlObj.searchParams.get('status') || 'success'
@@ -91,7 +101,6 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="Payment" />
         <Stack.Screen name="Leaderboard" />
-        {/* <Stack.Screen name="Leaderboard" /> */}
         <Stack.Screen name="SuccessQuest" />
         <Stack.Screen name="FailQuest" />
         <Stack.Screen name="SideQuest" />
@@ -100,6 +109,13 @@ export default function RootLayout() {
         <Stack.Screen name="StreetView" />
         <Stack.Screen name="EventDetails" />
         <Stack.Screen name="PaymentResult" />
+        <Stack.Screen 
+          name="payment-callback" 
+          options={{ 
+            headerShown: false,
+            title: 'Payment Processing'
+          }} 
+        />
       </Stack>
       <StatusBar style="auto" />
     </Provider>
