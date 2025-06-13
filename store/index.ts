@@ -4,7 +4,6 @@ import { authApi } from '@/features/auth/api/authApi'
 import { authSlice } from '@/features/auth/slice/authSlice'
 import { clueApi } from '@/features/clue/api/clueApi'
 import { reviewApi } from '@/features/review/api/reviewApi'
-import { homeApi } from '@/features/home/api/homeApi'
 
 import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
 import { paymentApi } from '@/features/orderPayment/api/paymentApi'

@@ -179,7 +179,7 @@ export default function SuccessStatus() {
       <View className="flex-row justify-center space-x-4 px-6 pb-6 mt-4">
         <Pressable
           className="px-5 py-3 mr-2 rounded-full bg-white border border-indigo-500 flex-1 flex-row items-center justify-center"
-          onPress={() => router.replace({ pathname: '/Leaderboard' })}
+          onPress={() => router.replace({ pathname: '/Dashboard' })}
         >
           <Text className="text-indigo-600 font-semibold">Check Rankings</Text>
         </Pressable>

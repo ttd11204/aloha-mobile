@@ -24,8 +24,8 @@ export default function TabLayout() {
         onClose={() => setSidebarVisible(false)}
       />
 
-      <View className="h-20 bg-[#0095ff] px-5 py-4">
-        <View className="flex-row items-center justify-between gap-3 pt-4">
+      <View className="h-20 bg-[#0095ff] px-5 py-4 mt-16">
+        <View className="flex-row items-center justify-between gap-3 pt-2">
           <TouchableOpacity onPress={() => setSidebarVisible(true)}>
             <Entypo name="menu" size={28} color="white" />
           </TouchableOpacity>
