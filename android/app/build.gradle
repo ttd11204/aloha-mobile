@@ -4,11 +4,10 @@ apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
-def googleMapsApiKey = new Properties()
-def googleMapsApiKeyFile = rootProject.file("app/google_maps_api_key.properties")
-if (googleMapsApiKeyFile.exists()) {
-    googleMapsApiKey.load(new FileInputStream(googleMapsApiKeyFile))
-}
+def keystorePropertiesFile = rootProject.file("app/google_maps_api_key.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -100,7 +99,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
-        resValue "string", "google_maps_api_key", googleMapsApiKey["GOOGLE_MAPS_API_KEY"] ?: ""
+        manifestPlaceholders = [ 
+            GOOGLE_MAPS_API_KEY: keystoreProperties['GOOGLE_MAPS_API_KEY']
+        ]
     }
     signingConfigs {
         debug {

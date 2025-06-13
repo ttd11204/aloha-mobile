@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { router } from 'expo-router'
 
 type Clue = {
   id: number
@@ -83,6 +84,21 @@ const ClueDetails = ({ clue, isCompleted }: ClueDetailsProps) => {
         <Text className="ml-2 text-blue-500">
           Destination: {clue.destination}
         </Text>
+
+        <TouchableOpacity
+          className="ml-2 bg-emerald-500 px-3 py-1 rounded-full"
+          onPress={() => {
+            router.push({
+              pathname: '/Dashboard',
+              params: { clueId: clue.id.toString() }
+            })
+          }}
+        >
+          <View className="flex-row items-center">
+            <Ionicons name="map-outline" size={16} color="white" />
+            <Text className="text-white ml-1 text-sm">View on Map</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View className="flex-row items-center mb-4">

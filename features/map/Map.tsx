@@ -16,9 +16,11 @@ import {
 
 import MapView, { Circle, Marker, Callout } from 'react-native-maps'
 
-// Mock Locations Data
+type MapComponentProps = {
+  focusClueId?: number
+}
 
-const MapComponent = () => {
+const MapComponent = ({ focusClueId }: MapComponentProps) => {
   const userId = useAppSelector((state) => state.auth.userId)
   const cityId = 1
 
@@ -32,23 +34,46 @@ const MapComponent = () => {
   )
   const currentLocation = LOCATIONS[selectedLocation]
 
+  // const visibleMarkers = useMemo(() => {
+  //   const clueProgress = userClue?.data ?? []
+
+  //   // Tìm clue có isSolved = false và order nhỏ nhất
+  //   const nextClue = [...clueProgress]
+  //     .filter((clue) => !clue.isSolved)
+  //     .sort((a, b) => a.order - b.order)[0]
+
+  //   if (!nextClue) return []
+
+  //   // Tìm marker tương ứng với clue đó
+  //   const targetMarker = currentLocation.markers.find(
+  //     (marker) => marker.clueId === nextClue.clueId
+  //   )
+
+  //   return targetMarker ? [targetMarker] : []
+  // }, [currentLocation, userClue])
+
   const visibleMarkers = useMemo(() => {
     const clueProgress = userClue?.data ?? []
 
-    // Tìm clue có isSolved = false và order nhỏ nhất
+    if (focusClueId) {
+      const targetMarker = currentLocation.markers.find(
+        (marker) => marker.clueId === focusClueId
+      )
+      return targetMarker ? [targetMarker] : []
+    }
+
     const nextClue = [...clueProgress]
       .filter((clue) => !clue.isSolved)
       .sort((a, b) => a.order - b.order)[0]
 
     if (!nextClue) return []
 
-    // Tìm marker tương ứng với clue đó
     const targetMarker = currentLocation.markers.find(
       (marker) => marker.clueId === nextClue.clueId
     )
 
     return targetMarker ? [targetMarker] : []
-  }, [currentLocation, userClue])
+  }, [currentLocation, userClue, focusClueId])
 
   useEffect(() => {
     const { width } = Dimensions.get('window')
