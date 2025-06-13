@@ -1,85 +1,80 @@
-import React, { useState } from 'react'
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
-import { useRespondToFriendRequestMutation } from '../api/chatApi'
+import React from 'react'
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { FriendRequest } from '../api/chatApi'
 
 interface FriendRequestItemProps {
   request: FriendRequest
-  userId: string
+  onAccept: (requestId: string) => void
+  onDecline: (requestId: string) => void
+  isProcessing: boolean
 }
 
-export default function FriendRequestItem({ request, userId }: FriendRequestItemProps) {
-  const [isResponding, setIsResponding] = useState(false)
-  const [respondToRequest] = useRespondToFriendRequestMutation()
-
-  const handleResponse = async (accepted: boolean) => {
-    setIsResponding(true)
-    
+const FriendRequestItem: React.FC<FriendRequestItemProps> = ({
+  request,
+  onAccept,
+  onDecline,
+  isProcessing
+}) => {
+  const formatDate = (dateString: string) => {
     try {
-      const result = await respondToRequest({
-        userId: userId,
-        requestId: request.id,
-        accepted: accepted
-      }).unwrap()
-
-      Alert.alert(
-        'Success', 
-        result.message || `Friend request ${accepted ? 'accepted' : 'rejected'} successfully!`
-      )
-    } catch (error: any) {
-      console.error('Respond to friend request error:', error)
-      Alert.alert('Error', 'Something went wrong. Please try again.')
-    } finally {
-      setIsResponding(false)
+      const date = new Date(dateString)
+      const now = new Date()
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+      
+      if (diffInHours < 1) return 'Just now'
+      if (diffInHours < 24) return `${diffInHours}h ago`
+      if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`
+      return date.toLocaleDateString()
+    } catch {
+      return 'Recently'
     }
   }
 
   return (
-    <View className="bg-white rounded-xl p-4 mb-3 shadow-sm border border-gray-100">
-      <View className="flex-row items-center mb-3">
+    <View className="bg-white rounded-xl p-4 mb-2 flex-row items-center justify-between">
+      <View className="flex-row items-center flex-1">
         <View className="w-12 h-12 bg-blue-100 rounded-full items-center justify-center mr-3">
-          <Text className="text-xl">👤</Text>
+          {request.fromUserAvatarUrl ? (
+            <Text className="text-lg">👤</Text>
+          ) : (
+            <Ionicons name="person" size={20} color="#3b82f6" />
+          )}
         </View>
         <View className="flex-1">
-          <Text className="font-semibold text-gray-800">
-            {request.fromUser.userName}
+          <Text className="font-semibold text-gray-800" numberOfLines={1}>
+            {request.fromUserFullname || request.fromUserEmail || 'Unknown User'}
           </Text>
-          <Text className="text-gray-500 text-sm">
-            {request.fromUser.email}
-          </Text>
+          <Text className="text-gray-500 text-sm">{formatDate(request.requestedAt)}</Text>
         </View>
       </View>
       
-      <Text className="text-gray-600 text-sm mb-4">
-        Wants to connect with you
-      </Text>
-      
-      <View className="flex-row gap-3">
-        <TouchableOpacity
-          onPress={() => handleResponse(false)}
-          disabled={isResponding}
-          className="flex-1 py-2 rounded-lg border border-gray-300"
+      <View className="flex-row gap-2">
+        <TouchableOpacity 
+          onPress={() => onDecline(request.requestId)}
+          className="bg-gray-200 px-4 py-2 rounded-lg"
+          disabled={isProcessing}
         >
-          {isResponding ? (
+          {isProcessing ? (
             <ActivityIndicator size="small" color="#6b7280" />
           ) : (
-            <Text className="text-center font-medium text-gray-700">Decline</Text>
+            <Text className="text-gray-700 font-medium">Decline</Text>
           )}
         </TouchableOpacity>
-        
-        <TouchableOpacity
-          onPress={() => handleResponse(true)}
-          disabled={isResponding}
-          className="flex-1 py-2 rounded-lg bg-blue-500"
+        <TouchableOpacity 
+          onPress={() => onAccept(request.requestId)}
+          className="bg-blue-500 px-4 py-2 rounded-lg"
+          disabled={isProcessing}
         >
-          {isResponding ? (
+          {isProcessing ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Text className="text-center font-medium text-white">Accept</Text>
+            <Text className="text-white font-medium">Accept</Text>
           )}
         </TouchableOpacity>
       </View>
     </View>
   )
-} 
+}
+
+export default FriendRequestItem 

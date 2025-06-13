@@ -23,8 +23,15 @@ import { jwtDecode } from 'jwt-decode'
 import { 
   useAddFriendMutation, 
   useGetFriendsQuery,
-  useGetFriendRequestsQuery 
+  useGetFriendRequestsQuery,
+  useRespondToFriendRequestMutation,
+  useCreateChatRoomMutation,
+  useGetChatRoomsQuery,
+  type Friend,
+  type FriendRequest,
+  type ChatRoom
 } from '../api/chatApi'
+import FriendRequestItem from './FriendRequestItem'
 
 // Custom Toast Component
 interface ToastProps {
@@ -35,25 +42,40 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ visible, message, type, onHide }) => {
-  const translateY = new Animated.Value(-100)
+  const translateY = React.useRef(new Animated.Value(-100)).current
+  const timeoutRef = React.useRef<number | null>(null)
 
-  useEffect(() => {
+  React.useLayoutEffect(() => {
     if (visible) {
-      Animated.sequence([
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.delay(3000),
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      translateY.setValue(-100)
+      
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start()
+
+      // Set timeout for auto hide
+      timeoutRef.current = setTimeout(() => {
         Animated.timing(translateY, {
           toValue: -100,
           duration: 300,
           useNativeDriver: true,
-        }),
-      ]).start(() => onHide())
+        }).start(() => onHide())
+      }, 3000)
     }
-  }, [visible])
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [visible, translateY, onHide])
 
   if (!visible) return null
 
@@ -87,6 +109,7 @@ export default function ChatScreen() {
   const [userId, setUserId] = useState<string | null>(null)
   const [showAddFriendModal, setShowAddFriendModal] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [processingRequestId, setProcessingRequestId] = useState<string | null>(null)
   
   // Toast state
   const [toast, setToast] = useState<{
@@ -100,20 +123,35 @@ export default function ChatScreen() {
   })
 
   const [addFriend, { isLoading: addingFriend }] = useAddFriendMutation()
-  const { data: friends = [], isLoading: loadingFriends } = useGetFriendsQuery(userId || '', {
+  const [respondToFriendRequest] = useRespondToFriendRequestMutation()
+  const [createChatRoom] = useCreateChatRoomMutation()
+  const { data: friends = [], isLoading: loadingFriends, refetch: refetchFriends } = useGetFriendsQuery(userId || '', {
     skip: !userId
   })
-  const { data: friendRequests = [], isLoading: loadingRequests } = useGetFriendRequestsQuery(userId || '', {
+  const { data: friendRequests = [], isLoading: loadingRequests, refetch: refetchRequests } = useGetFriendRequestsQuery(userId || '', {
     skip: !userId
   })
+  // Temporarily commented out chat rooms API
+  // const { data: chatRooms = [], isLoading: loadingChatRooms, refetch: refetchChatRooms } = useGetChatRoomsQuery(userId || '', {
+  //   skip: !userId
+  // })
+  const chatRooms: any[] = [] // Temporary empty array
+  const loadingChatRooms = false
 
   useEffect(() => {
     const getUserId = async () => {
       try {
+        console.log('=== DEBUG GET USER ID ===')
         const token = await AsyncStorage.getItem('accessToken')
+        console.log('Token exists:', !!token)
+        
         if (token) {
           const decoded: any = jwtDecode(token)
+          console.log('Decoded token:', decoded)
+          console.log('User ID from token:', decoded?.sub)
           setUserId(decoded?.sub || null)
+        } else {
+          console.log('No access token found')
         }
       } catch (error) {
         console.error('Error getting user ID:', error)
@@ -183,11 +221,238 @@ export default function ChatScreen() {
     }
   }
 
-  const mockFriends = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', avatar: '👨‍💼', lastMessage: 'Hey! How are you?', timestamp: '2 min ago', unread: 2 },
-    { id: '2', name: 'Sarah Wilson', email: 'sarah@example.com', avatar: '👩‍🎨', lastMessage: 'See you tomorrow!', timestamp: '1 hour ago', unread: 0 },
-    { id: '3', name: 'Mike Johnson', email: 'mike@example.com', avatar: '👨‍💻', lastMessage: 'Thanks for the help', timestamp: '3 hours ago', unread: 1 }
-  ]
+  const handleFriendRequest = async (requestId: string, accepted: boolean) => {
+    console.log('=== DEBUG FRIEND REQUEST RESPONSE ===')
+    console.log('Request ID:', requestId)
+    console.log('Accepted:', accepted)
+    console.log('User ID:', userId)
+
+    if (!userId) {
+      console.log('ERROR: No userId for friend request response')
+      showToast('You need to be logged in', 'error')
+      return
+    }
+
+    if (!requestId) {
+      console.log('ERROR: No requestId provided')
+      showToast('Invalid request', 'error')
+      return
+    }
+
+    setProcessingRequestId(requestId)
+    
+    try {
+      const requestData = {
+        userId: userId,
+        requestId: requestId,
+        accepted: accepted
+      }
+      console.log('Friend request response data:', requestData)
+      
+      const result = await respondToFriendRequest(requestData).unwrap()
+      
+      console.log('Friend request response result:', result)
+      showToast(result.message || `Friend request ${accepted ? 'accepted' : 'rejected'}!`, 'success')
+      
+      // Refresh both friends and requests lists
+      await Promise.all([
+        refetchRequests(),
+        accepted ? refetchFriends() : Promise.resolve()
+      ])
+      
+    } catch (error: any) {
+      console.log('=== FRIEND REQUEST RESPONSE ERROR ===')
+      console.error('Full error:', error)
+      console.log('Error status:', error.status)
+      console.log('Error data:', error.data)
+      console.log('Error message:', error.message)
+      
+      let errorMessage = 'Failed to respond to friend request'
+      if (error.status === 404) {
+        errorMessage = 'Friend request not found'
+      } else if (error.status === 400) {
+        errorMessage = 'Invalid request'
+      } else if (error.status === 401) {
+        errorMessage = 'You need to login again'
+      } else if (error.data?.message) {
+        errorMessage = error.data.message
+      }
+      
+      showToast(errorMessage, 'error')
+    } finally {
+      setProcessingRequestId(null)
+    }
+  }
+
+  const handleStartChat = async (friendUserId: string, friendName: string, friendEmail?: string) => {
+    console.log('=== DEBUG START CHAT ===')
+    console.log('Current userId:', userId)
+    console.log('Target friendUserId:', friendUserId)
+    console.log('Friend name:', friendName)
+    console.log('Available chat rooms:', chatRooms)
+
+    if (!userId) {
+      console.log('ERROR: No userId found')
+      return
+    }
+
+    try {
+      // Check if chat room already exists
+      const existingRoom = chatRooms.find(room => 
+        !room.IsGroup && 
+        room.Name && 
+        friendName && 
+        room.Name.includes(friendName)
+      )
+
+      console.log('Existing room found:', existingRoom)
+
+      if (existingRoom) {
+        // Navigate to existing chat room
+        console.log('Using existing chat room:', existingRoom.Id)
+        router.push({
+          pathname: '/ChatConversation',
+          params: {
+            chatRoomId: existingRoom.Id,
+            chatRoomName: existingRoom.Name,
+            friendEmail: friendEmail || friendName,
+            friendId: friendUserId
+          }
+        } as any)
+        return
+      }
+
+      // Create new chat room
+      console.log('Creating new chat room...')
+      
+      if (!userId || !friendUserId) {
+        console.log('ERROR: Missing required IDs - userId:', userId, 'friendUserId:', friendUserId)
+        showToast('Missing user information', 'error')
+        return
+      }
+      
+      const requestData = {
+        userId: userId,
+        targetUserId: friendUserId
+      }
+      console.log('Create chat room request data:', requestData)
+      console.log('Expected endpoint: POST https://aloha-vietnam.azurewebsites.net/api/chat/room')
+
+      const newRoom = await createChatRoom(requestData).unwrap()
+      
+      console.log('Chat room created successfully:', newRoom)
+      // await refetchChatRooms() // Temporarily commented out
+
+      // Navigate to new chat room
+      router.push({
+        pathname: '/ChatConversation',
+        params: {
+          chatRoomId: newRoom.Id,
+          chatRoomName: newRoom.Name,
+          friendEmail: friendEmail || friendName,
+          friendId: friendUserId
+        }
+      } as any)
+    } catch (error: any) {
+      console.log('=== CREATE CHAT ROOM ERROR ===')
+      console.error('Full error object:', error)
+      console.log('Error status:', error.status)
+      console.log('Error data:', error.data)
+      console.log('Error message:', error.message)
+      
+      if (error.data) {
+        console.log('Server response data:', JSON.stringify(error.data, null, 2))
+      }
+      
+      showToast('Failed to start chat', 'error')
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    
+    if (diffInHours < 1) return 'Just now'
+    if (diffInHours < 24) return `${diffInHours}h ago`
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`
+    return date.toLocaleDateString()
+  }
+
+  // Combine chat rooms and friends for display
+  const conversationsForDisplay = React.useMemo(() => {
+    // Return empty array if data is still loading or undefined
+    if (loadingFriends || loadingChatRooms || !friends || !chatRooms) {
+      return []
+    }
+
+    const conversations: Array<{
+      id: string
+      name: string
+      email?: string
+      avatar: string
+      lastMessage: string
+      timestamp: string
+      unread: number
+      type: 'chatroom' | 'friend'
+      chatRoomId?: string
+    }> = []
+
+    // Add existing chat rooms
+    if (Array.isArray(chatRooms)) {
+      chatRooms.forEach(room => {
+        if (room && !room.IsGroup && room.Id && room.Name) {
+          conversations.push({
+            id: room.Id,
+            name: room.Name || 'Chat Room',
+            avatar: '💬',
+            lastMessage: 'Continue conversation...',
+            timestamp: formatDate(room.CreatedAt || new Date().toISOString()),
+            unread: 0,
+            type: 'chatroom',
+            chatRoomId: room.Id
+          })
+        }
+      })
+    }
+
+    // Add friends without chat rooms
+    if (Array.isArray(friends)) {
+      friends.forEach(friend => {
+        if (friend && friend.friendUserId) {
+          const friendName = friend.friendFullname || friend.friendEmail || ''
+          const hasExistingRoom = Array.isArray(chatRooms) && chatRooms.some(room => 
+            room &&
+            !room.IsGroup && 
+            room.Name && 
+            friendName && 
+            room.Name.includes(friendName)
+          )
+          
+          if (!hasExistingRoom) {
+            conversations.push({
+              id: friend.friendUserId,
+              name: friendName || 'Unknown Friend',
+              email: friend.friendEmail,
+              avatar: friend.friendAvatarUrl || '👤',
+              lastMessage: 'Click to start chatting!',
+              timestamp: formatDate(friend.friendsSince || new Date().toISOString()),
+              unread: 0,
+              type: 'friend'
+            })
+          }
+        }
+      })
+    }
+
+    return conversations.sort((a, b) => {
+      try {
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      } catch {
+        return 0
+      }
+    })
+  }, [friends, chatRooms, loadingFriends, loadingChatRooms])
 
   return (
     <View className="flex-1 bg-white">
@@ -215,69 +480,99 @@ export default function ChatScreen() {
             <Text className="text-white text-xl font-semibold">Messages</Text>
           </View>
           
-          <TouchableOpacity 
-            onPress={() => setShowAddFriendModal(true)}
-            className="bg-white/20 rounded-full p-2"
-          >
-            <MaterialIcons name="person-add" size={24} color="white" />
-          </TouchableOpacity>
+          <View className="relative">
+            <TouchableOpacity 
+              onPress={() => setShowAddFriendModal(true)}
+              className="bg-white/20 rounded-full p-2"
+            >
+              <MaterialIcons name="person-add" size={24} color="white" />
+            </TouchableOpacity>
+            {friendRequests.length > 0 && (
+              <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[20px] h-5 items-center justify-center">
+                <Text className="text-white text-xs font-bold">
+                  {friendRequests.length > 9 ? '9+' : friendRequests.length}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
       </LinearGradient>
 
       {/* Friend Requests Section */}
       {friendRequests.length > 0 && (
         <View className="bg-blue-50 px-4 py-3 border-b border-gray-200">
-          <Text className="text-blue-600 font-medium mb-2">Friend Requests ({friendRequests.length})</Text>
-          <TouchableOpacity 
-            onPress={() => {
-              // TODO: Implement Friend Requests screen
-              showToast('Friend requests feature will be available soon!', 'success')
-            }}
-            className="flex-row items-center"
-          >
-            <Ionicons name="people" size={20} color="#3b82f6" />
-            <Text className="text-blue-600 ml-2">View all requests</Text>
-            <Ionicons name="chevron-forward" size={16} color="#3b82f6" className="ml-1" />
-          </TouchableOpacity>
+          <Text className="text-blue-600 font-medium mb-3">Friend Requests ({friendRequests.length})</Text>
+          
+          {friendRequests.slice(0, 2).map((request) => (
+            <FriendRequestItem
+              key={request.requestId}
+              request={request}
+              onAccept={(requestId) => handleFriendRequest(requestId, true)}
+              onDecline={(requestId) => handleFriendRequest(requestId, false)}
+              isProcessing={processingRequestId === request.requestId}
+            />
+          ))}
+          
+          {friendRequests.length > 2 && (
+            <TouchableOpacity className="flex-row items-center justify-center pt-2">
+              <Text className="text-blue-600 font-medium">View all {friendRequests.length} requests</Text>
+              <Ionicons name="chevron-down" size={16} color="#3b82f6" className="ml-1" />
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
       {/* Chat List */}
       <ScrollView className="flex-1">
-        {loadingFriends ? (
+        {(loadingFriends || loadingChatRooms) ? (
           <View className="flex-1 justify-center items-center py-20">
             <ActivityIndicator size="large" color="#0095ff" />
             <Text className="text-gray-500 mt-2">Loading conversations...</Text>
           </View>
-        ) : mockFriends.length > 0 ? (
+        ) : conversationsForDisplay.length > 0 ? (
           <View className="px-4 py-2">
-            {mockFriends.map((friend) => (
+            {conversationsForDisplay.map((conversation) => (
               <TouchableOpacity 
-                key={friend.id}
+                key={conversation.id}
                 className="flex-row items-center py-4 border-b border-gray-100"
                 onPress={() => {
-                  // TODO: Implement Chat Conversation screen
-                  showToast(`Start conversation with ${friend.name}`, 'success')
+                  if (conversation.type === 'chatroom') {
+                    router.push({
+                      pathname: '/ChatConversation',
+                      params: {
+                        chatRoomId: conversation.chatRoomId || conversation.id,
+                        chatRoomName: conversation.name,
+                        friendEmail: conversation.email || conversation.name,
+                        friendId: conversation.id
+                      }
+                    } as any)
+                  } else {
+                    handleStartChat(conversation.id, conversation.name, conversation.email)
+                  }
                 }}
               >
                 <View className="w-12 h-12 bg-blue-100 rounded-full items-center justify-center mr-3">
-                  <Text className="text-2xl">{friend.avatar}</Text>
+                  {typeof conversation.avatar === 'string' && (conversation.avatar.length === 2 || conversation.avatar === '💬') ? (
+                    <Text className="text-2xl">{conversation.avatar}</Text>
+                  ) : (
+                    <Ionicons name="person" size={24} color="#3b82f6" />
+                  )}
                 </View>
                 
                 <View className="flex-1">
                   <View className="flex-row justify-between items-center mb-1">
-                    <Text className="font-semibold text-gray-800">{friend.name}</Text>
-                    <Text className="text-xs text-gray-500">{friend.timestamp}</Text>
+                    <Text className="font-semibold text-gray-800">{conversation.name}</Text>
+                    <Text className="text-xs text-gray-500">{conversation.timestamp}</Text>
                   </View>
                   <Text className="text-gray-600 text-sm" numberOfLines={1}>
-                    {friend.lastMessage}
+                    {conversation.lastMessage}
                   </Text>
                 </View>
                 
-                {friend.unread > 0 && (
+                {conversation.unread > 0 && (
                   <View className="bg-red-500 rounded-full min-w-[20px] h-5 items-center justify-center ml-2">
                     <Text className="text-white text-xs font-medium">
-                      {friend.unread > 9 ? '9+' : friend.unread}
+                      {conversation.unread > 9 ? '9+' : conversation.unread}
                     </Text>
                   </View>
                 )}

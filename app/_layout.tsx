@@ -108,6 +108,8 @@ export default function RootLayout() {
           <Stack.Screen name="SideQuest" />
           <Stack.Screen name="Login" options={{ headerShown: false }} />
           <Stack.Screen name="Chat" options={{ headerShown: false }} />
+          <Stack.Screen name="ChatConversation" options={{ headerShown: false }} />
+          <Stack.Screen name="TestButton" options={{ headerShown: false }} />
           <Stack.Screen name="Clue" />
           <Stack.Screen name="StreetView" />
           <Stack.Screen name="EventDetails" />

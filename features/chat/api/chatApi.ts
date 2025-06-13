@@ -21,30 +21,61 @@ export interface RespondFriendResponse {
 }
 
 export interface FriendRequest {
+  requestId: string
+  fromUserId: string
+  fromUserEmail: string
+  fromUserFullname?: string
+  fromUserAvatarUrl?: string
+  requestedAt: string
+}
+
+export interface Friend {
+  friendUserId: string
+  friendEmail: string
+  friendFullname?: string
+  friendAvatarUrl?: string
+  friendsSince: string
+}
+
+export interface ChatRoom {
+  Id: string
+  Name: string
+  IsGroup: boolean
+  CreatedAt: string
+}
+
+export interface CreateChatRoomRequest {
+  userId: string
+  targetUserId: string
+}
+
+export interface SendMessageRequest {
+  userId: string
+  chatRoomId: string
+  content: string
+  messageType: string
+}
+
+export interface SendMessageResponse {
   id: string
-  fromUser: {
-    id: string
-    userName: string
-    email: string
-    avatar?: string
-  }
-  toUser: {
-    id: string
-    userName: string
-    email: string
-    avatar?: string
-  }
-  status: 'pending' | 'accepted' | 'rejected'
-  createdAt: string
+  senderId: string
+  senderFullname: string | null
+  senderAvatarUrl: string
+  content: string
+  sentAt: string
+  isRead: boolean
+  messageType: string
 }
 
 export interface ChatMessage {
   id: string
   senderId: string
-  receiverId: string
-  message: string
-  timestamp: string
-  read: boolean
+  senderFullname: string | null
+  senderAvatarUrl: string
+  content: string
+  sentAt: string
+  isRead: boolean
+  messageType: string
 }
 
 export const chatApi = createApi({
@@ -62,9 +93,9 @@ export const chatApi = createApi({
       invalidatesTags: ['Friend', 'FriendRequest']
     }),
 
-    // Get friend requests (incoming)
+    // Get incoming friend requests
     getFriendRequests: builder.query<FriendRequest[], string>({
-      query: (userId) => `User/friendrequests/${userId}`,
+      query: (userId) => `User/incoming-friend-requests?userId=${userId}`,
       providesTags: ['FriendRequest']
     }),
 
@@ -79,28 +110,56 @@ export const chatApi = createApi({
     }),
 
     // Get friends list
-    getFriends: builder.query<any[], string>({
-      query: (userId) => `User/friends/${userId}`,
+    getFriends: builder.query<Friend[], string>({
+      query: (userId) => `User/friends?userId=${userId}`,
       providesTags: ['Friend']
     }),
 
-    // Get chat messages (mock endpoint - chưa có backend)
-    getChatMessages: builder.query<ChatMessage[], { userId: string; friendId: string }>({
-      query: ({ userId, friendId }) => `Chat/messages/${userId}/${friendId}`,
+    // Create chat room for 1-1 conversation
+    createChatRoom: builder.mutation<ChatRoom, CreateChatRoomRequest>({
+      query: (body) => ({
+        url: 'chat/room',
+        method: 'POST',
+        body,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }),
+      invalidatesTags: ['Chat']
+    }),
+
+    // Get user's chat rooms - TEMPORARILY COMMENTED OUT
+    getChatRooms: builder.query<ChatRoom[], string>({
+      query: (userId) => {
+        // Temporarily comment out the API call
+        // return `Chat/rooms?UserId=${userId}`
+        throw new Error('Chat rooms API temporarily disabled')
+      },
       providesTags: ['Chat']
     }),
 
-    // Send message (mock endpoint - chưa có backend)
-    sendMessage: builder.mutation<
-      { success: boolean },
-      { senderId: string; receiverId: string; message: string }
-    >({
-      query: ({ senderId, receiverId, message }) => ({
-        url: 'Chat/send',
+    // Send message to chat room
+    sendMessage: builder.mutation<SendMessageResponse, SendMessageRequest>({
+      query: (body) => ({
+        url: 'Chat/messages',
         method: 'POST',
-        body: { senderId, receiverId, message }
+        body,
+        headers: {
+          'Content-Type': 'application/json',
+        }
       }),
       invalidatesTags: ['Chat']
+    }),
+
+    // Get chat messages with pagination
+    getChatMessages: builder.query<ChatMessage[], { page?: number; pageSize?: number; chatRoomId?: string }>({
+      query: ({ page = 1, pageSize = 30, chatRoomId }) => {
+        if (!chatRoomId) {
+          throw new Error('chatRoomId is required')
+        }
+        return `Chat/messages?chatRoomId=${chatRoomId}&page=${page}&pageSize=${pageSize}`
+      },
+      providesTags: ['Chat']
     })
   })
 })
@@ -110,6 +169,8 @@ export const {
   useGetFriendRequestsQuery,
   useRespondToFriendRequestMutation,
   useGetFriendsQuery,
+  useCreateChatRoomMutation,
+  useGetChatRoomsQuery,
   useGetChatMessagesQuery,
   useSendMessageMutation
 } = chatApi 
