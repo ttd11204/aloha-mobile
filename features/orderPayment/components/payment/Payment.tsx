@@ -6,79 +6,191 @@ import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
+  Platform,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
-import DaysOrderPage from "../days/DaysPayment";
 import ProgressBar from "../progressBar/ProgressBar";
+import { useGetPackageDataByIdQuery } from '@/components/api/packageApi';
+import { formatDate } from "@/utils";
+import { useCreatePaymentMutation } from '@/features/orderPayment/api/paymentApi';
+import { useRouter } from 'expo-router';
 
-const AnnualOrderPage = () => {
+// Multiple fallback URLs for better compatibility
+const MOBILE_CALLBACK_URL = 'aloha://payment-callback';
+// const WEB_FALLBACK_URL = 'https://your-domain.com/payment-callback'; // Replace with your actual domain
+// const UNIVERSAL_LINK = 'https://your-domain.com/app/payment-callback'; // Universal link fallback
+
+const Payment = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { id = "1" } = (route as { params?: { id?: string } }).params || {};
 
+  // Lấy thông tin package theo id
+  const {
+    data: packageData,
+    isLoading: isPackageLoading,
+    error: packageError,
+  } = useGetPackageDataByIdQuery(Number(id));
+
   const [userId, setUserId] = useState("");
   const [origin, setOrigin] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [createPayment] = useCreatePaymentMutation();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   // Set origin based on platform
-  //   setOrigin(Platform.OS === "ios" ? "ios-app" : "android-app");
-
-  //   // Fetch package data
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await getPackageApi();
-  //       console.log(res);
-  //     } catch (error) {
-  //       console.error("Error fetching package data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [id]);
+  useEffect(() => {
+    // Set origin based on platform
+    setOrigin(Platform.OS === "ios" ? "ios-app" : "android-app");
+  }, []);
 
   useEffect(() => {
     const getToken = async () => {
       try {
         const token = await AsyncStorage.getItem("accessToken");
+        console.log("Retrieved token:", token ? "Token exists" : "No token found"); // Debug log
 
         if (token) {
-          const decode = jwtDecode(token);
-          setUserId(decode?.sub ?? "");
+          const decode = jwtDecode(token) as any;
+          console.log("Decoded token:", decode); // Debug log
+          
+          const extractedUserId = decode?.sub || decode?.userId || decode?.id;
+          
+          if (extractedUserId) {
+            setUserId(String(extractedUserId));
+            console.log("Set userId:", extractedUserId); // Debug log
+          } else {
+            console.log("No userId found in token"); // Debug log
+            setUserId("");
+          }
+        } else {
+          console.log("No access token found"); // Debug log
+          setUserId("");
         }
       } catch (error) {
         console.error("Error decoding token:", error);
         setUserId("");
+        
+        // Optionally show alert for token issues
+        Alert.alert(
+          "Authentication Error", 
+          "There was an issue with your login session. Please login again.",
+          [{ text: "OK" }]
+        );
       }
     };
 
     getToken();
   }, []);
 
-  // Render DaysPayment component if id is 2
-  if (id === "2") {
-    return <DaysOrderPage />;
+  if (isPackageLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#187af2" />
+      </View>
+    );
   }
 
-  // const handlePayment = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await postPaymentApi(userId, Number(id) || 0, origin, 2);
+  if (packageError || !packageData) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text>Không tìm thấy thông tin gói dịch vụ.</Text>
+      </View>
+    );
+  }
 
-  //     // Open payment URL in browser
-  //     if (response.data && response.data.paymentUrl) {
-  //       await Linking.openURL(response.data.paymentUrl);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error when processing payment:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+
+  const handlePayment = async () => {
+    // Validate userId before proceeding
+    if (!userId || userId.trim() === "") {
+      Alert.alert(
+        "Authentication Required",
+        "Please login first to proceed with payment.",
+        [
+          { text: "Login", onPress: () => router.push('/Login') },
+          { text: "Cancel" }
+        ]
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log("Payment attempt with userId:", userId); // Debug log
+      
+      const formData = new FormData();
+      formData.append('UserId', userId);
+      formData.append('PackageId', String(packageData.id));
+      // Use mobile deep link as primary callback
+      formData.append('FrontEndUrl', MOBILE_CALLBACK_URL);
+      // Add fallback URLs for better compatibility
+      // formData.append('FallbackUrl', WEB_FALLBACK_URL);
+      // formData.append('UniversalLink', UNIVERSAL_LINK);
+      formData.append('Method', '2');
+      // formData.append('Platform', Platform.OS);
+
+      const response = await createPayment(formData).unwrap();
+      console.log("Payment response:", response);
+      
+      const paymentUrl = response?.data?.paymentUrl;
+      if (paymentUrl) {
+        // Check if URL can be opened
+        const supported = await Linking.canOpenURL(paymentUrl);
+        if (supported) {
+          await Linking.openURL(paymentUrl);
+          
+          // Set up a fallback mechanism in case deep link doesn't work
+          const fallbackTimer = setTimeout(() => {
+            Alert.alert(
+              "Payment Processing",
+              "If the payment page doesn't load, please return to the app manually.",
+              [
+                { text: "Check Payment Status", onPress: () => checkPaymentStatus() },
+                { text: "OK" }
+              ]
+            );
+          }, 3000);
+          
+          // Clear timer if user returns to app
+          const subscription = Linking.addEventListener('url', () => {
+            clearTimeout(fallbackTimer);
+          });
+          
+          return () => subscription.remove();
+        } else {
+          throw new Error('Cannot open payment URL');
+        }
+      } else {
+        throw new Error('No payment URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      
+      // Check if it's a userId validation error from backend
+      const errorMessage = (error as any)?.data?.message || (error as any)?.message || "Unable to process payment";
+      
+      Alert.alert(
+        "Payment Error",
+        errorMessage,
+        [
+          { text: "Retry", onPress: () => handlePayment() },
+          { text: "Cancel", onPress: () => router.push({ pathname: '/PaymentResult', params: { status: 'failed' } }) }
+        ]
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkPaymentStatus = () => {
+    // Navigate to a payment status check page or show current status
+    router.push({ pathname: '/PaymentResult', params: { status: 'pending' } });
+  };
 
   return (
     <View className="flex-1 bg-[#f5f7fb]">
@@ -111,7 +223,7 @@ const AnnualOrderPage = () => {
           {/* Package Info */}
           <View className="px-4 mb-6">
             <Text className="text-xl font-bold text-[#187af2] mb-2">
-              Forever Premium Package
+              {packageData.description}
             </Text>
             <View className="flex-row items-center">
               <Ionicons
@@ -144,15 +256,17 @@ const AnnualOrderPage = () => {
                 <View className="flex-row justify-between items-center mb-2">
                   <View>
                     <Text className="text-lg font-bold text-[#1F2937]">
-                      Annual Plan
+                      {packageData.description}
                     </Text>
-                    <Text className="text-xs text-[#10B981] font-medium mt-1">
-                      Save 20%
-                    </Text>
+                    {packageData.isFree ? (
+                      <Text className="text-xs text-[#10B981] font-medium mt-1">
+                        Miễn phí
+                      </Text>
+                    ) : null}
                   </View>
                   <View className="items-end">
                     <Text className="text-xl text-[#10B981] font-bold">
-                      US$7/mo
+                      {packageData.isFree ? 'Free' : `$${packageData.price}/mo`}
                     </Text>
                     <Text className="text-xs text-[#6B7280]">incl. VAT</Text>
                   </View>
@@ -174,7 +288,7 @@ const AnnualOrderPage = () => {
                   <View className="flex-row justify-between mb-2">
                     <Text className="text-sm text-[#6B7280]">Order Total</Text>
                     <Text className="text-sm text-[#1F2937] font-medium">
-                      US$7/mo
+                      {`$${packageData.price}/mo`}
                     </Text>
                   </View>
                 </View>
@@ -204,7 +318,7 @@ const AnnualOrderPage = () => {
                 <View className="flex-row items-start mt-2">
                   <View className="w-1 h-5 bg-[#60A5FA] rounded-sm mr-2 mt-0.5"></View>
                   <Text className="text-sm text-[#4B5563] flex-1">
-                    Cancel before Apr 08, 2025 to avoid getting billed
+                    `Cancel before {formatDate(new Date(packageData.toDate))} to avoid getting billed`
                   </Text>
                 </View>
                 <View className="flex-row items-start mt-2">
@@ -274,7 +388,7 @@ const AnnualOrderPage = () => {
                           <Text className="text-[#DC2626] font-bold">FROM</Text>
                         </View>
                         <Text className="text-xs text-[#6B7280] font-medium">
-                          March 24, 2025
+                          {formatDate(new Date(packageData.fromDate))}
                         </Text>
                       </View>
                       <View className="flex-row justify-between items-center">
@@ -283,7 +397,7 @@ const AnnualOrderPage = () => {
                         </Text>
                         <View className="flex-row items-end">
                           <Text className="text-2xl font-bold text-[#4F46E5]">
-                            $7
+                            {`$${packageData.price}`}
                           </Text>
                           <Text className="text-sm text-[#6B7280] ml-1">
                             /mo
@@ -335,7 +449,7 @@ const AnnualOrderPage = () => {
                       <View className="flex-row justify-between items-center">
                         <Text className="text-[#10B981] font-bold">TO</Text>
                         <Text className="text-sm text-[#6B7280] font-medium">
-                          March 24, 2026
+                          {formatDate(new Date(packageData.toDate))}
                         </Text>
                       </View>
                       <Text className="text-sm text-[#6B7280] mt-2">
@@ -366,7 +480,7 @@ const AnnualOrderPage = () => {
                     </Text>
                     <View className="items-end">
                       <Text className="text-lg font-bold text-[#111827]">
-                        $7.00
+                       {`$${packageData.price}.00`}
                       </Text>
                       <Text className="text-xs text-[#6B7280]">
                         billed annually
@@ -383,7 +497,7 @@ const AnnualOrderPage = () => {
                       <Text className="text-xs text-[#6B7280]">•••• 4242</Text>
                     </View>
                     <Text className="text-xs text-[#6B7280]">
-                      Next charge: April 24, 2025
+                      `Next charge: ${packageData.price} on {formatDate(new Date(packageData.toDate))}`
                     </Text>
                   </View>
                 </View>
@@ -415,7 +529,7 @@ const AnnualOrderPage = () => {
 
               <TouchableOpacity
                 className="bg-[#4F46E5] rounded-xl py-3 px-4 items-center justify-center flex-1 shadow-sm"
-                // onPress={handlePayment}
+                onPress={handlePayment}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -447,4 +561,4 @@ const AnnualOrderPage = () => {
   );
 };
 
-export default AnnualOrderPage;
+export default Payment;

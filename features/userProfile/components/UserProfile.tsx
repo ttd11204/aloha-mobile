@@ -17,6 +17,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { logout } from '@/features/auth/slice/authSlice';
 import LoginRequired from '@/components/LoginRequired';
 import { router } from 'expo-router';
+import { useGetUserProfileQuery, useGetUserStatsQuery } from '../api/userProfileApi';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,6 +25,8 @@ export default function UserProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const {data: profile, isFetching: profileFetching, isLoading: profileLoading} = useGetUserProfileQuery(userId ?? '')
+  const {data: stat, isFetching: statsFetching, isLoading: statsLoading} = useGetUserStatsQuery(userId ?? '')
   const dispatch = useAppDispatch();
 
   const profileData = {
@@ -45,9 +48,9 @@ export default function UserProfile() {
   ];
 
   const stats = [
-    { label: 'Solved Clue', value: profileData.clue },
-    { label: 'Solved Quest', value: profileData.quest },
-    { label: 'Current Rank', value: profileData.rank },
+    { label: 'Solved Clue', value: stat?.solvedClues },
+    { label: 'Solved Quest', value: stat?.solvedQuests },
+    { label: 'Current Rank', value: stat?.currentRank },
   ];
 
   useEffect(() => {
@@ -129,10 +132,10 @@ export default function UserProfile() {
           {/* Name và Username */}
           <View className="items-center mb-4 px-6">
             <Text className="text-2xl font-bold text-gray-800 mb-1">
-              {profileData.name}
+              {profile?.userName}
             </Text>
             <Text className="text-gray-500 text-base mb-3">
-              {profileData.username}
+              {profile?.email}
             </Text>
             
             {/* Bio */}

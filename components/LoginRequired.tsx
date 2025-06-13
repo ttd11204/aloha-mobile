@@ -205,7 +205,7 @@ export default function LoginRequired() {
       </LinearGradient>
 
       {/* Bottom Navigation */}
-      <View className="bg-blue-500 flex-row">
+      {/* <View className="bg-blue-500 flex-row">
         <TouchableOpacity className="flex-1 items-center py-3">
           <Feather name="info" size={20} color="white" />
           <Text className="text-white text-xs mt-1">PrivacyPolicy</Text>
@@ -223,7 +223,7 @@ export default function LoginRequired() {
           <Feather name="user" size={20} color="yellow-400" />
           <Text className="text-yellow-400 text-xs mt-1">Profile</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

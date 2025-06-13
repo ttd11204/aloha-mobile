@@ -3,10 +3,12 @@ import { packageApi } from '@/components/api/packageApi'
 import { authApi } from '@/features/auth/api/authApi'
 import { authSlice } from '@/features/auth/slice/authSlice'
 import { clueApi } from '@/features/clue/api/clueApi'
-import { homeApi } from '@/features/home/api/homeApi'
+import { reviewApi } from '@/features/review/api/reviewApi'
 
 import { userProgressApi } from '@/features/leaderboard/api/leaderboardApi'
+import { paymentApi } from '@/features/orderPayment/api/paymentApi'
 import { questApi } from '@/features/side-quest/api/sideQuestApi'
+import { userApi } from '@/features/userProfile/api/userProfileApi'
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 
@@ -21,7 +23,10 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [questApi.reducerPath]: questApi.reducer,
     [clueApi.reducerPath]: clueApi.reducer,
-    [userProgressApi.reducerPath]: userProgressApi.reducer
+    [userProgressApi.reducerPath]: userProgressApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -31,7 +36,10 @@ export const store = configureStore({
       authApi.middleware,
       questApi.middleware,
       clueApi.middleware,
-      userProgressApi.middleware
+      userProgressApi.middleware,
+      userApi.middleware,
+      paymentApi.middleware,
+      reviewApi.middleware
     )
 })
 

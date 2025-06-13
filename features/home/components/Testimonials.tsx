@@ -6,7 +6,7 @@ const testimonials = [
   {
     name: 'John Doe',
     comment: 'Amazing experience!',
-    location: 'Ho Chi Minh City',
+    location: 'Da Nang City',
     date: 'May 10, 2025',
     avatar: require('@/assets/Side_Image/shawn.jpg'),
   },
@@ -14,8 +14,8 @@ const testimonials = [
     name: "Rosie",
     avatar: require('@/assets/Side_Image/Rosie.jpg'),
     comment:
-      "This app transformed our trip to Ha Long Bay. The cave exploration challenge had us discovering places we would never have found on our own!",
-    location: "Ha Long Bay",
+      "This app transformed our trip to Da Nang City. The cave exploration challenge had us discovering places we would never have found on our own!",
+    location: "Da Nang City",
     date: "February 15, 2025",
   },
 ];

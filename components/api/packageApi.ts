@@ -10,6 +10,9 @@ export const packageApi = createApi({
     getPackageData: builder.query<Package[], void>({
       query: () => '/Package',
     }),
+    getPackageDataById: builder.query<Package, number>({
+      query: (id) => `/Package/${id}`,
+    }),
   }),
 });
-export const { useGetPackageDataQuery } = packageApi;
+export const { useGetPackageDataQuery, useGetPackageDataByIdQuery } = packageApi;

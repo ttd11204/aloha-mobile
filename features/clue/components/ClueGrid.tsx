@@ -14,12 +14,6 @@ type Clue = {
   answerCode: string
 }
 
-type UserClue = {
-  id: number
-  order: number
-  isSolved: boolean
-}
-
 type ClueGridProps = {
   cityClues: Clue[]
   userClues: UserCityClues[]

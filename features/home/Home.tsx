@@ -27,32 +27,32 @@ import { Package } from './types';
 
 const featuredDestinations = [
   {
-    name: 'Hue Imperial City',
-    location: 'Central Vietnam',
+    name: 'My Khe Beach',
+    location: 'Son Tra District, Da Nang',
     challenges: 5,
     rating: 4.9,
     isNew: true,
     image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: 'Hanoi Old Quarter',
-    location: 'Northern Vietnam',
+    name: 'Marble Mountains',
+    location: 'Ngu Hanh Son District, Da Nang',
     challenges: 8,
     rating: 4.7,
     isNew: false,
     image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: 'Da Nang Beach',
-    location: 'Central Vietnam',
+    name: 'Dragon Bridge',
+    location: 'Hai Chau District, Da Nang',
     challenges: 3,
     rating: 4.6,
     isNew: true,
     image: require('../../assets/Side_Image/hue.jpg') as ImageSourcePropType,
   },
   {
-    name: 'Mekong Delta',
-    location: 'Southern Vietnam',
+    name: 'Ba Na Hills',
+    location: 'Hoa Vang District, Da Nang',
     challenges: 6,
     rating: 4.8,
     isNew: false,
@@ -93,16 +93,7 @@ export default function HomePage() {
       style={styles.packageCard}
       onPress={() => {
         console.log('Package ID:', item.id);
-        if (item.id === 1) {
-          console.log('Annual Payment');
-          router.push('/AnnualPayment');
-        } else if (item.id === 2) {
-          console.log('Days Payment');
-          router.push('/DaysPayment');
-        }
-        // else {
-        //   navigation.navigate('PackageDetail', { id: item.id });
-        // }
+        router.push({ pathname: '/Payment', params: { id: item.id.toString() } });
       }}
     >
       <Text style={styles.packageName}>{item.name}</Text>
