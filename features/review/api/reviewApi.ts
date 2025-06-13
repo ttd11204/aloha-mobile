@@ -16,7 +16,8 @@ export const reviewApi = createApi({
       query: () => ({
         url: 'Review',
         method: 'GET'
-      })
+      }),
+      providesTags: ['Review']
     }),
     postReview: builder.mutation<ResponseData<ReviewResult>, PostReviewRequest>(
       {

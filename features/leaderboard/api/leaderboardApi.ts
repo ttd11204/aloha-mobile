@@ -7,6 +7,7 @@ console.trace('useGetTop3UserByCityIdQuery called')
 export const userProgressApi = createApi({
   reducerPath: 'userProgressApi',
   baseQuery: baseQueryWithErrorHandling,
+  tagTypes: ['UserProgress'],
   endpoints: (builder) => ({
     // Get leaderboard data
     getTop3UserByCityId: builder.query<
@@ -22,7 +23,10 @@ export const userProgressApi = createApi({
       { userId: string; cityId: number }
     >({
       query: ({ userId, cityId }) =>
-        `/UserProgress/GetUserRankInCity/${cityId}/${userId}`
+        `/UserProgress/GetUserRankInCity/${cityId}/${userId}`,
+      providesTags: (result, error, { userId, cityId }) => [
+        { type: 'UserProgress', id: `RANK-${userId}-${cityId}` }
+      ]
     })
   })
 })

@@ -1,8 +1,11 @@
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { useGetUserCityCluesQuery } from '@/features/clue/api/clueApi'
 import { LOCATIONS } from '@/features/map/mock/mock'
 import { LocationKey } from '@/features/map/types'
+import { useAppSelector } from '@/store/hooks'
+import { skipToken } from '@reduxjs/toolkit/query'
 import { ChevronDown, ChevronUp, MapPin, Search } from 'lucide-react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   View,
   Text,
@@ -16,10 +19,36 @@ import MapView, { Circle, Marker, Callout } from 'react-native-maps'
 // Mock Locations Data
 
 const MapComponent = () => {
-  const [selectedLocation, setSelectedLocation] = useState<LocationKey>('HCMC')
+  const userId = useAppSelector((state) => state.auth.userId)
+  const cityId = 1
+
+  const [selectedLocation, setSelectedLocation] =
+    useState<LocationKey>('DANANG')
   const [isExpanded, setIsExpanded] = useState(true)
   const [mapHeight, setMapHeight] = useState(400)
   const [loading, setLoading] = useState(false)
+  const { data: userClue } = useGetUserCityCluesQuery(
+    userId ? { userId, cityId } : skipToken
+  )
+  const currentLocation = LOCATIONS[selectedLocation]
+
+  const visibleMarkers = useMemo(() => {
+    const clueProgress = userClue?.data ?? []
+
+    // Tìm clue có isSolved = false và order nhỏ nhất
+    const nextClue = [...clueProgress]
+      .filter((clue) => !clue.isSolved)
+      .sort((a, b) => a.order - b.order)[0]
+
+    if (!nextClue) return []
+
+    // Tìm marker tương ứng với clue đó
+    const targetMarker = currentLocation.markers.find(
+      (marker) => marker.clueId === nextClue.clueId
+    )
+
+    return targetMarker ? [targetMarker] : []
+  }, [currentLocation, userClue])
 
   useEffect(() => {
     const { width } = Dimensions.get('window')
@@ -49,8 +78,6 @@ const MapComponent = () => {
   }, [])
 
   const toggleExpanded = () => setIsExpanded(!isExpanded)
-
-  const currentLocation = LOCATIONS[selectedLocation]
 
   const handleLocationChange = (locationKey: any) => {
     setLoading(true)
@@ -136,7 +163,7 @@ const MapComponent = () => {
             zoomEnabled={true}
             scrollEnabled={true}
           >
-            {currentLocation.markers.map((marker, index) => (
+            {visibleMarkers.map((marker, index) => (
               <React.Fragment key={index}>
                 <Circle
                   center={{
@@ -146,7 +173,7 @@ const MapComponent = () => {
                   radius={marker.radius}
                   strokeWidth={2}
                   strokeColor={marker.color}
-                  fillColor={`${marker.color}33`} // 33 is ~20% opacity in hex
+                  fillColor={`${marker.color}33`} // 20% opacity
                 />
                 {marker.name && (
                   <Marker
@@ -154,7 +181,7 @@ const MapComponent = () => {
                       latitude: marker.position[0],
                       longitude: marker.position[1]
                     }}
-                    pinColor="#f59e0b" // Amber color for treasure marker
+                    pinColor="#f59e0b"
                   >
                     <Callout tooltip>
                       <View className="bg-white p-2 rounded-lg shadow">
