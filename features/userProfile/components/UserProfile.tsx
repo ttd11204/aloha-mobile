@@ -173,7 +173,10 @@ export default function UserProfile() {
               </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity className="flex-1 py-3 rounded-full border border-gray-300">
+            <TouchableOpacity 
+              className="flex-1 py-3 rounded-full border border-gray-300"
+              onPress={() => router.push('/Chat')}
+            >
               <Text className="text-center font-semibold text-gray-700">
                 Message
               </Text>

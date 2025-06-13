@@ -98,6 +98,14 @@ const CluesComponent = () => {
           userId,
           cityId: 1
         }).unwrap()
+        
+        // Clear verification code và move to next clue
+        setVerificationCode('')
+        const nextClue = selectedClue + 1
+        if (nextClue <= (cityClues?.length || 0)) {
+          setSelectedClue(nextClue)
+        }
+        
         setTimeout(() => {
           setShowReviewPopup(true)
         }, 800)

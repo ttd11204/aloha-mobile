@@ -78,29 +78,29 @@ export default function LoginRequired() {
               transform: [{ translateY: slideAnim }]
             }}
           >
-            {/* Top Section - 30% */}
-            <View className="flex-1 justify-center items-center" style={{ height: height * 0.3 }}>
+            {/* Top Section - 25% */}
+            <View className="flex-1 justify-center items-center" style={{ height: height * 0.25 }}>
               <Animated.View 
                 className="items-center"
                 style={{ transform: [{ scale: scaleAnim }] }}
               >
                 {/* Lock Icon */}
-                <View className="w-24 h-24 bg-white/20 rounded-3xl items-center justify-center mb-6 backdrop-blur-sm border border-white/30">
-                  <Feather name="lock" size={40} color="white" />
+                <View className="w-20 h-20 bg-white/20 rounded-3xl items-center justify-center mb-4 backdrop-blur-sm border border-white/30">
+                  <Feather name="lock" size={32} color="white" />
                 </View>
 
                 {/* Title */}
-                <Text className="text-white text-3xl font-bold text-center mb-3">
-                  Đăng Nhập Để Tiếp Tục
+                <Text className="text-white text-2xl font-bold text-center mb-2">
+                  Login To Continue
                 </Text>
-                <Text className="text-white/90 text-base text-center leading-6 px-2">
-                  Bạn cần đăng nhập để trải nghiệm đầy đủ các{'\n'}tính năng tuyệt vời của ứng dụng
+                <Text className="text-white/90 text-sm text-center leading-5 px-2">
+                  You need to login to experience all the{'\n'}awesome features of the application
                 </Text>
               </Animated.View>
             </View>
 
-            {/* Middle Section - 40% */}
-            <View className="flex-1" style={{ height: height * 0.4 }}>
+            {/* Middle Section - 35% */}
+            <View className="flex-1" style={{ height: height * 0.35 }}>
               <Animated.View 
                 className="space-y-4 pt-4"
                 style={{ transform: [{ translateY: slideAnim }] }}
@@ -113,10 +113,10 @@ export default function LoginRequired() {
                     </View>
                     <View className="flex-1">
                       <Text className="text-white font-semibold text-lg">
-                        Tính năng cao cấp
+                        Advanced features
                       </Text>
                       <Text className="text-white/80 text-sm mt-1">
-                        Truy cập không giới hạn tất cả tính năng
+                        Access unlimited all features
                       </Text>
                     </View>
                   </View>
@@ -130,10 +130,10 @@ export default function LoginRequired() {
                     </View>
                     <View className="flex-1">
                       <Text className="text-white font-semibold text-lg">
-                        Đồng bộ dữ liệu
+                        Data synchronization
                       </Text>
                       <Text className="text-white/80 text-sm mt-1">
-                        Lưu trữ và đồng bộ dữ liệu trên mọi thiết bị
+                        Store and synchronize data on all devices
                       </Text>
                     </View>
                   </View>
@@ -147,10 +147,10 @@ export default function LoginRequired() {
                     </View>
                     <View className="flex-1">
                       <Text className="text-white font-semibold text-lg">
-                        Bảo mật cao
+                        High security
                       </Text>
                       <Text className="text-white/80 text-sm mt-1">
-                        Dữ liệu được bảo vệ an toàn tuyệt đối
+                        Data is protected absolutely
                       </Text>
                     </View>
                   </View>
@@ -158,8 +158,8 @@ export default function LoginRequired() {
               </Animated.View>
             </View>
 
-            {/* Bottom Section - 30% */}
-            <View className="flex-1 justify-end pb-8" >
+            {/* Bottom Section - 40% */}
+            <View className="flex-1 justify-center pb-8" >
               <Animated.View 
                 className="space-y-4"
                 style={{ transform: [{ scale: scaleAnim }] }}
@@ -174,7 +174,7 @@ export default function LoginRequired() {
                     <View className="flex-row items-center">
                       <Feather name="arrow-right" size={20} color="white" />
                       <Text className="text-white text-lg font-bold ml-2">
-                        Đăng Nhập
+                        Login
                       </Text>
                     </View>
                   </View>
@@ -187,14 +187,14 @@ export default function LoginRequired() {
                   activeOpacity={0.8}
                 >
                   <Text className="text-white text-base font-medium">
-                    Bỏ qua lần này
+                    Skip this time
                   </Text>
                 </TouchableOpacity>
 
                 {/* Bottom Info */}
                 <View className="items-center pt-4">
                   <Text className="text-white/70 text-sm">
-                    Miễn phí • Nhanh chóng • An toàn
+                    Free • Fast • Safe
                   </Text>
                 </View>
               </Animated.View>

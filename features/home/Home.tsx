@@ -189,7 +189,7 @@ export default function HomePage() {
         />
         <View style={styles.heroContent}>
           <Text style={styles.heroTitle}>
-            Are you ready? <Plane size={16} />
+            Are you ready to explore ? <Plane size={16} />
           </Text>
           <Text style={styles.heroSubtitle}>
             Complete the mission to unlock the next location.
@@ -305,7 +305,7 @@ export default function HomePage() {
             </Text>
 
             {/* Buttons */}
-            <View className="w-full space-y-3">
+            <View className="w-full space-y-6">
               <TouchableOpacity
                 onPress={() => {
                   setShowStartModal(false)
@@ -330,7 +330,7 @@ export default function HomePage() {
 
               <TouchableOpacity
                 onPress={() => setShowStartModal(false)}
-                className="bg-gray-100 rounded-xl py-4 items-center"
+                className="bg-gray-100 rounded-xl py-4 items-center mt-4"
               >
                 <Text className="text-gray-600 text-base font-medium">
                   Maybe Later
@@ -370,7 +370,8 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 16,
+    color: '#1f2937'
   },
   heroSubtitle: {
     color: '#555',

@@ -17,12 +17,6 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  {
-    label: 'Dashboard',
-    route: '/Dashboard',
-    icon: '📊',
-    backgroundColor: '#187af2'
-  },
   { label: 'Clues', route: '/Clue', icon: '🔍', backgroundColor: '#187af2' },
   {
     label: 'Side Quests',

@@ -8,6 +8,7 @@ import {
   Dimensions,
   StatusBar,
 } from 'react-native';
+import { router } from 'expo-router';
 
 interface LoginSuccessModalProps {
   visible: boolean;
@@ -24,56 +25,85 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
 }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
   const checkmarkAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const titleAnim = useRef(new Animated.Value(0)).current;
+  const messageAnim = useRef(new Animated.Value(0)).current;
+  const buttonAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
       // Reset animations
       scaleAnim.setValue(0);
       fadeAnim.setValue(0);
-      slideAnim.setValue(50);
+      slideAnim.setValue(30);
       checkmarkAnim.setValue(0);
       pulseAnim.setValue(1);
+      titleAnim.setValue(0);
+      messageAnim.setValue(0);
+      buttonAnim.setValue(0);
 
-      // Start entrance animation sequence
-      Animated.sequence([
+      // Start smooth entrance animation sequence
+      Animated.parallel([
+        // Background fade in
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 100,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
           duration: 400,
           useNativeDriver: true,
         }),
-        Animated.spring(checkmarkAnim, {
+        // Modal scale up
+        Animated.spring(scaleAnim, {
           toValue: 1,
-          tension: 150,
-          friction: 8,
+          tension: 80,
+          friction: 7,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => {
+        // After modal appears, animate content
+        Animated.stagger(150, [
+          // Checkmark animation
+          Animated.spring(checkmarkAnim, {
+            toValue: 1,
+            tension: 120,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          // Title animation
+          Animated.spring(titleAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          // Message animation
+          Animated.spring(messageAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          // Button animation
+          Animated.spring(buttonAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      });
 
-      // Start pulse animation
+      // Start gentle pulse animation
       const pulseAnimation = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
-            toValue: 1.1,
-            duration: 1000,
+            toValue: 1.05,
+            duration: 1500,
             useNativeDriver: true,
           }),
           Animated.timing(pulseAnim, {
             toValue: 1,
-            duration: 1000,
+            duration: 1500,
             useNativeDriver: true,
           }),
         ])
@@ -83,19 +113,21 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
   }, [visible]);
 
   const handleClose = () => {
-    Animated.sequence([
+    Animated.parallel([
       Animated.timing(scaleAnim, {
         toValue: 0.8,
-        duration: 200,
+        duration: 250,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 200,
+        duration: 250,
         useNativeDriver: true,
       }),
     ]).start(() => {
       onClose();
+      // Navigate to main screen
+      router.replace('/(tabs)');
     });
   };
 
@@ -152,7 +184,6 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
               {
                 transform: [
                   { scale: scaleAnim },
-                  { translateY: slideAnim },
                 ],
                 opacity: fadeAnim,
               },
@@ -177,7 +208,15 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
             {/* Title */}
             <Animated.View
               style={{
-                transform: [{ translateY: slideAnim }],
+                opacity: titleAnim,
+                transform: [
+                  {
+                    translateY: titleAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
               }}
             >
               <Text className="text-2xl font-bold text-gray-800 mb-2 text-center">
@@ -188,8 +227,15 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
             {/* Welcome Message */}
             <Animated.View
               style={{
-                transform: [{ translateY: slideAnim }],
-                opacity: fadeAnim,
+                opacity: messageAnim,
+                transform: [
+                  {
+                    translateY: messageAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
               }}
             >
               <Text className="text-gray-600 text-center mb-6 text-base leading-6">
@@ -199,34 +245,49 @@ const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
             </Animated.View>
 
             {/* Decorative Dots */}
-            <View className="flex-row space-x-2 mb-6">
+            <Animated.View 
+              className="flex-row space-x-2 mb-6"
+              style={{
+                opacity: messageAnim,
+                transform: [
+                  {
+                    scale: messageAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.8, 1],
+                    }),
+                  },
+                ],
+              }}
+            >
               {[0, 1, 2].map((index) => (
-                <Animated.View
+                <View
                   key={index}
-                  style={{
-                    opacity: fadeAnim,
-                    transform: [
-                      {
-                        scale: fadeAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [0, 1],
-                        }),
-                      },
-                    ],
-                  }}
                   className={`w-2 h-2 rounded-full ${
                     index === 0 ? 'bg-blue-400' : 
                     index === 1 ? 'bg-green-400' : 'bg-purple-400'
                   }`}
                 />
               ))}
-            </View>
+            </Animated.View>
             
             {/* Action Button */}
             <Animated.View
               style={{
-                transform: [{ translateY: slideAnim }],
-                opacity: fadeAnim,
+                opacity: buttonAnim,
+                transform: [
+                  {
+                    translateY: buttonAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [30, 0],
+                    }),
+                  },
+                  {
+                    scale: buttonAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.9, 1],
+                    }),
+                  },
+                ],
               }}
               className="w-full"
             >

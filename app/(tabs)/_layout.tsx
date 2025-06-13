@@ -1,5 +1,6 @@
 import React from 'react'
 import Sidebar from '@/components/SideBar'
+import FriendRequestNotification from '@/components/FriendRequestNotification'
 import {
   AntDesign,
   Entypo,
@@ -7,9 +8,9 @@ import {
   FontAwesome5,
   MaterialIcons
 } from '@expo/vector-icons'
-import { Tabs } from 'expo-router'
+import { Tabs, router } from 'expo-router'
 import { useState } from 'react'
-import { Image, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Platform, Text, TouchableOpacity, View, Alert } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const BLUE_TAB_COLOR = '#0095ff'
@@ -48,6 +49,16 @@ export default function TabLayout() {
           >
             Aloha Vietnam
           </Text>
+          <View className="flex-row items-center gap-3">
+            <FriendRequestNotification 
+              onPress={() => {
+                Alert.alert('Friend Requests', 'Friend requests feature will be available soon!')
+              }}
+            />
+            <TouchableOpacity onPress={() => router.push('/Profile' as any)}>
+              <FontAwesome name="user" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <Tabs
@@ -73,20 +84,20 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => (
-              <MaterialIcons name="home" size={24} color={color} />
-            )
-          }}
-        />
-        <Tabs.Screen
           name="QA"
           options={{
             title: 'Q&A',
             tabBarIcon: ({ color }) => (
               <AntDesign name="questioncircle" size={24} color={color} />
+            )
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="home" size={24} color={color} />
             )
           }}
         />
@@ -100,11 +111,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="Profile"
+          name="Dashboard"
           options={{
-            title: 'Profile',
+            title: 'Dashboard',
             tabBarIcon: ({ color }) => (
-              <FontAwesome name="user" size={24} color={color} />
+              <MaterialIcons name="dashboard" size={24} color={color} />
             )
           }}
         />
