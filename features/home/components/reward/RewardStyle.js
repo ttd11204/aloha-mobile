@@ -95,4 +95,37 @@ export const alohaRewardsStyles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
   },
+  rankText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  rankBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  pointsDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  pointsText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+    marginLeft: 8,
+  },
 });
