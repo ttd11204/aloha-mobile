@@ -13,7 +13,7 @@ module.exports = function (api) {
           alias: {
             "@": "./"              // Point to root project directory
           },
-          extensions: [".js", ".jsx", ".ts", ".tsx", ".json"]
+          extensions: [".tsx", ".ts", ".js", ".jsx", ".json"]
         }
       ],
       "react-native-reanimated/plugin"
