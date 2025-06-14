@@ -4,7 +4,7 @@ import { View } from "react-native";
 
 export default function Index() {
   return (
-    <View className="items-center">
+    <View className="items-center mb-6">
       <HomePage />
     </View>
   );
