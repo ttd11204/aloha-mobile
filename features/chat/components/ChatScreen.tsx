@@ -137,6 +137,7 @@ export default function ChatScreen() {
   // })
   const chatRooms: any[] = [] // Temporary empty array
   const loadingChatRooms = false
+  const refetchChatRooms = async () => {} // Dummy function
 
   useEffect(() => {
     const getUserId = async () => {
@@ -293,66 +294,54 @@ export default function ChatScreen() {
 
     if (!userId) {
       console.log('ERROR: No userId found')
+      showToast('You need to be logged in to start a chat', 'error')
+      return
+    }
+
+    if (!friendUserId) {
+      console.log('ERROR: No friendUserId provided')
+      showToast('Friend information is missing', 'error')
       return
     }
 
     try {
-      // Check if chat room already exists
-      const existingRoom = chatRooms.find(room => 
-        !room.IsGroup && 
-        room.Name && 
-        friendName && 
-        room.Name.includes(friendName)
-      )
-
-      console.log('Existing room found:', existingRoom)
-
-      if (existingRoom) {
-        // Navigate to existing chat room
-        console.log('Using existing chat room:', existingRoom.Id)
-        router.push({
-          pathname: '/ChatConversation',
-          params: {
-            chatRoomId: existingRoom.Id,
-            chatRoomName: existingRoom.Name,
-            friendEmail: friendEmail || friendName,
-            friendId: friendUserId
-          }
-        } as any)
-        return
-      }
-
-      // Create new chat room
+      // Always try to create a new chat room for now (since getChatRooms is disabled)
       console.log('Creating new chat room...')
-      
-      if (!userId || !friendUserId) {
-        console.log('ERROR: Missing required IDs - userId:', userId, 'friendUserId:', friendUserId)
-        showToast('Missing user information', 'error')
-        return
-      }
       
       const requestData = {
         userId: userId,
         targetUserId: friendUserId
       }
       console.log('Create chat room request data:', requestData)
-      console.log('Expected endpoint: POST https://aloha-vietnam.azurewebsites.net/api/chat/room')
 
       const newRoom = await createChatRoom(requestData).unwrap()
       
-      console.log('Chat room created successfully:', newRoom)
-      // await refetchChatRooms() // Temporarily commented out
+      console.log('✅ Chat room created successfully:', newRoom)
+      console.log('✅ Room ID:', newRoom.Id)
+      console.log('✅ Room Name:', newRoom.Name)
 
-      // Navigate to new chat room
+      // Validate that we have a proper chatRoomId
+      if (!newRoom.Id) {
+        console.error('❌ ERROR: Created room has no ID')
+        showToast('Failed to create chat room - no ID returned', 'error')
+        return
+      }
+
+      // Navigate to new chat room with proper validation
+      const navigationParams = {
+        chatRoomId: newRoom.Id,
+        chatRoomName: newRoom.Name || friendName,
+        friendEmail: friendEmail || friendName,
+        friendId: friendUserId
+      }
+      
+      console.log('✅ Navigating with params:', navigationParams)
+      
       router.push({
         pathname: '/ChatConversation',
-        params: {
-          chatRoomId: newRoom.Id,
-          chatRoomName: newRoom.Name,
-          friendEmail: friendEmail || friendName,
-          friendId: friendUserId
-        }
+        params: navigationParams
       } as any)
+      
     } catch (error: any) {
       console.log('=== CREATE CHAT ROOM ERROR ===')
       console.error('Full error object:', error)
@@ -364,7 +353,19 @@ export default function ChatScreen() {
         console.log('Server response data:', JSON.stringify(error.data, null, 2))
       }
       
-      showToast('Failed to start chat', 'error')
+      // Better error messages
+      let errorMessage = 'Failed to start chat'
+      if (error.status === 400) {
+        errorMessage = 'Invalid request - please check your connection'
+      } else if (error.status === 401) {
+        errorMessage = 'You need to login again'  
+      } else if (error.status === 500) {
+        errorMessage = 'Server error - please try again later'
+      } else if (error.data?.message) {
+        errorMessage = error.data.message
+      }
+      
+      showToast(errorMessage, 'error')
     }
   }
 

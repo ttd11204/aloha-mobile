@@ -31,6 +31,14 @@ export default function ChatConversation() {
     friendId: string
   }>()
 
+  // Debug params
+  console.log('=== DEBUG CHAT CONVERSATION PARAMS ===')
+  console.log('All params:', params)
+  console.log('chatRoomId:', params.chatRoomId)
+  console.log('chatRoomName:', params.chatRoomName)
+  console.log('friendEmail:', params.friendEmail)
+  console.log('friendId:', params.friendId)
+
   const [userId, setUserId] = useState<string | null>(null)
   const [messageText, setMessageText] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -54,13 +62,23 @@ export default function ChatConversation() {
   useEffect(() => {
     const getUserId = async () => {
       try {
+        console.log('=== DEBUG GET USER ID ===')
         const token = await AsyncStorage.getItem('accessToken')
+        console.log('Token exists:', !!token)
+        console.log('Token preview:', token ? token.substring(0, 50) + '...' : 'null')
+        
         if (token) {
           const decoded: any = jwtDecode(token)
+          console.log('Decoded token:', decoded)
+          console.log('User ID from token:', decoded?.sub)
           setUserId(decoded?.sub || null)
+        } else {
+          console.log('❌ No access token found')
+          setUserId(null)
         }
       } catch (error) {
-        console.error('Error getting user ID:', error)
+        console.error('❌ Error getting user ID:', error)
+        setUserId(null)
       }
     }
     getUserId()
@@ -78,12 +96,43 @@ export default function ChatConversation() {
   }, [messages])
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !userId || !params.chatRoomId) {
-      console.log('Cannot send message - missing data:', {
-        hasMessage: !!messageText.trim(),
-        hasUserId: !!userId,
-        hasChatRoomId: !!params.chatRoomId
-      })
+    console.log('=== DEBUG SEND MESSAGE START ===')
+    console.log('messageText:', messageText)
+    console.log('messageText.trim():', messageText.trim())
+    console.log('userId:', userId)
+    console.log('params.chatRoomId:', params.chatRoomId)
+    
+    // Handle missing chatRoomId case
+    let activeChatRoomId = params.chatRoomId
+    
+    if (!activeChatRoomId && params.friendId && userId) {
+      console.log('⚠️ No chatRoomId provided, attempting to create chat room...')
+      Alert.alert(
+        'Chat Room Required', 
+        'This conversation needs a chat room. Please go back to the messages screen and start the chat properly.',
+        [
+          { text: 'Go Back', onPress: () => router.back() }
+        ]
+      )
+      return
+    }
+    
+    if (!messageText.trim() || !userId || !activeChatRoomId) {
+              console.log('❌ Cannot send message - missing data:', {
+          hasMessage: !!messageText.trim(),
+          hasUserId: !!userId,
+          hasChatRoomId: !!params.chatRoomId,
+          activeChatRoomId: activeChatRoomId,
+          messageLength: messageText.length,
+          params: params
+        })
+      
+      // Alert để user biết vấn đề
+      if (!userId) {
+        Alert.alert('Lỗi', 'Bạn cần đăng nhập lại để gửi tin nhắn')
+      } else if (!params.chatRoomId) {
+        Alert.alert('Lỗi', 'Không tìm thấy phòng chat. Vui lòng quay lại và thử lại.')
+      }
       return
     }
 
@@ -111,7 +160,7 @@ export default function ChatConversation() {
     try {
       const requestData = {
         userId: userId,
-        chatRoomId: params.chatRoomId,
+        chatRoomId: activeChatRoomId,
         content: originalMessage,
         messageType: 'text'
       }
