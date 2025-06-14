@@ -2,6 +2,7 @@
 import { packageApi } from '@/components/api/packageApi'
 import { authApi } from '@/features/auth/api/authApi'
 import { authSlice } from '@/features/auth/slice/authSlice'
+import { chatApi } from '@/features/chat/api/chatApi'
 import { clueApi } from '@/features/clue/api/clueApi'
 import { reviewApi } from '@/features/review/api/reviewApi'
 
@@ -21,6 +22,7 @@ export const store = configureStore({
     // [homeApi.reducerPath]: homeApi.reducer,
     [packageApi.reducerPath]: packageApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [chatApi.reducerPath]: chatApi.reducer,
     [questApi.reducerPath]: questApi.reducer,
     [clueApi.reducerPath]: clueApi.reducer,
     [userProgressApi.reducerPath]: userProgressApi.reducer,
@@ -34,6 +36,7 @@ export const store = configureStore({
     }).concat(
       packageApi.middleware,
       authApi.middleware,
+      chatApi.middleware,
       questApi.middleware,
       clueApi.middleware,
       userProgressApi.middleware,

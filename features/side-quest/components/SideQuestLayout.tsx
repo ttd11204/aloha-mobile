@@ -7,7 +7,6 @@ import { jwtDecode } from 'jwt-decode'
 import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
-  Dimensions,
   Image,
   Modal,
   ScrollView,
@@ -27,6 +26,7 @@ import Animated, {
 import { Challenge, TreasureHuntItem } from '../types'
 import { useSubmitQuestMutation } from '../api/sideQuestApi'
 import * as FileSystem from 'expo-file-system'
+import { useResponsiveDesign } from '@/hooks/useResponsiveDesign'
 
 interface SideQuestProps {
   challenges: TreasureHuntItem[]
@@ -42,7 +42,7 @@ export function SideQuestLayout({
   const [media, setMedia] = useState<{ [key: string]: any }>({})
   const [showUploadSuccess, setShowUploadSuccess] = useState(false)
   const [userId, setUserId] = useState('')
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width)
+  const { width, isSmallScreen } = useResponsiveDesign()
   const [selectedFile, setSelectedFile] = useState<any>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -65,11 +65,7 @@ export function SideQuestLayout({
 
     loadToken()
 
-    const updateLayout = () => {
-      setWindowWidth(Dimensions.get('window').width)
-    }
-
-    Dimensions.addEventListener('change', updateLayout)
+    // Layout will be handled by useResponsiveDesign hook
 
     return () => {
       // Remove event listener on cleanup
@@ -288,7 +284,7 @@ export function SideQuestLayout({
 
                 <ScrollView className="max-h-[120px] mb-4">
                   {selectedChallenge.requirement
-                    ?.slice(0, windowWidth < 380 ? 2 : 3)
+                    ?.slice(0, width < 380 ? 2 : 3)
                     .map((outcome, idx) => (
                       <View key={idx} className="flex-row items-start mb-1.5">
                         <Text className="text-emerald-600 mr-2 font-bold">
@@ -301,11 +297,11 @@ export function SideQuestLayout({
                     ))}
                   {selectedChallenge.requirement &&
                     selectedChallenge.requirement.length >
-                      (windowWidth < 380 ? 2 : 3) && (
+                      (width < 380 ? 2 : 3) && (
                       <Text className="text-violet-600 text-sm mt-1">
                         +{' '}
                         {selectedChallenge.requirement.length -
-                          (windowWidth < 380 ? 2 : 3)}{' '}
+                          (width < 380 ? 2 : 3)}{' '}
                         more
                       </Text>
                     )}

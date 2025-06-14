@@ -1,4 +1,6 @@
+import React from 'react'
 import Sidebar from '@/components/SideBar'
+import FriendRequestNotification from '@/components/FriendRequestNotification'
 import {
   AntDesign,
   Entypo,
@@ -6,9 +8,10 @@ import {
   FontAwesome5,
   MaterialIcons
 } from '@expo/vector-icons'
-import { Tabs } from 'expo-router'
+import { Tabs, router } from 'expo-router'
 import { useState } from 'react'
-import { Image, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Platform, Text, TouchableOpacity, View, Alert } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const BLUE_TAB_COLOR = '#0095ff'
 const ACTIVE_ICON_COLOR = '#ffff00'
@@ -16,6 +19,7 @@ const INACTIVE_ICON_COLOR = '#ffffff'
 
 export default function TabLayout() {
   const [isSidebarVisible, setSidebarVisible] = useState(false)
+  const insets = useSafeAreaInsets()
 
   return (
     <>
@@ -24,20 +28,37 @@ export default function TabLayout() {
         onClose={() => setSidebarVisible(false)}
       />
 
-      <View className="h-20 bg-[#0095ff] px-5 py-4 mt-16">
-        <View className="flex-row items-center justify-between gap-3 pt-2">
+      {/* Safe area spacer */}
+      <View 
+        className="bg-[#0095ff]" 
+        style={{ height: insets.top }} 
+      />
+      
+      {/* Header */}
+      <View className="h-16 bg-[#0095ff] px-5 py-3">
+        <View className="flex-row items-center justify-between gap-3 pt-1">
           <TouchableOpacity onPress={() => setSidebarVisible(true)}>
             <Entypo name="menu" size={28} color="white" />
           </TouchableOpacity>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: 18,
               color: 'white',
               fontWeight: '600'
             }}
           >
             Aloha Vietnam
           </Text>
+          <View className="flex-row items-center gap-3">
+            <FriendRequestNotification 
+              onPress={() => {
+                Alert.alert('Friend Requests', 'Friend requests feature will be available soon!')
+              }}
+            />
+            <TouchableOpacity onPress={() => router.push('/Profile' as any)}>
+              <FontAwesome name="user" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <Tabs
@@ -47,6 +68,8 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {
             backgroundColor: BLUE_TAB_COLOR,
+            paddingBottom: insets.bottom,
+            height: 60 + insets.bottom,
             ...(Platform.OS === 'android' && { position: 'absolute' })
           }
         }}
@@ -61,20 +84,20 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => (
-              <MaterialIcons name="home" size={24} color={color} />
-            )
-          }}
-        />
-        <Tabs.Screen
           name="QA"
           options={{
             title: 'Q&A',
             tabBarIcon: ({ color }) => (
               <AntDesign name="questioncircle" size={24} color={color} />
+            )
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="home" size={24} color={color} />
             )
           }}
         />
@@ -88,11 +111,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="Profile"
+          name="Dashboard"
           options={{
-            title: 'Profile',
+            title: 'Dashboard',
             tabBarIcon: ({ color }) => (
-              <FontAwesome name="user" size={24} color={color} />
+              <MaterialIcons name="dashboard" size={24} color={color} />
             )
           }}
         />

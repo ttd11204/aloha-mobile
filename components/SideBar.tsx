@@ -17,12 +17,6 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  {
-    label: 'Dashboard',
-    route: '/Dashboard',
-    icon: '📊',
-    backgroundColor: '#187af2'
-  },
   { label: 'Clues', route: '/Clue', icon: '🔍', backgroundColor: '#187af2' },
   {
     label: 'Side Quests',
@@ -59,7 +53,7 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
 
   return (
     <Animated.View
-      className="absolute z-50 w-full h-full"
+      className="absolute z-50 w-full h-full flex-row"
       style={{
         transform: [{ translateX }],
         backgroundColor: 'rgba(0,0,0,0.5)'
@@ -229,17 +223,14 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
           ))}
         </View>
 
-        {/* Close Button */}
-        <View className="p-6">
-          <TouchableOpacity
-            onPress={onClose}
-            className="flex-row items-center justify-center p-4 rounded-lg active:opacity-80"
-            style={{ backgroundColor: '#dc2626' }}
-          >
-            <Text className="text-white text-lg font-semibold">Close</Text>
-          </TouchableOpacity>
-        </View>
       </View>
+      
+      {/* Touch area to close sidebar */}
+      <TouchableOpacity 
+        className="flex-1 h-full"
+        onPress={onClose}
+        activeOpacity={1}
+      />
     </Animated.View>
   )
 }

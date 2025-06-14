@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import 'react-native-reanimated'
 import * as Linking from 'expo-linking'
 import { useRouter } from 'expo-router'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { store } from '@/store'
@@ -97,27 +98,32 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Payment" />
-        <Stack.Screen name="Leaderboard" />
-        <Stack.Screen name="SuccessQuest" />
-        <Stack.Screen name="FailQuest" />
-        <Stack.Screen name="SideQuest" />
-        <Stack.Screen name="Login" />
-        <Stack.Screen name="Clue" />
-        <Stack.Screen name="StreetView" />
-        <Stack.Screen name="EventDetails" />
-        <Stack.Screen name="PaymentResult" />
-        <Stack.Screen 
-          name="payment-callback" 
-          options={{ 
-            headerShown: false,
-            title: 'Payment Processing'
-          }} 
-        />
-      </Stack>
-      <StatusBar style="auto" />
+      <SafeAreaProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="Payment" />
+          <Stack.Screen name="Leaderboard" />
+          <Stack.Screen name="SuccessQuest" />
+          <Stack.Screen name="FailQuest" />
+          <Stack.Screen name="SideQuest" />
+          <Stack.Screen name="Login" options={{ headerShown: false }} />
+          <Stack.Screen name="Chat" options={{ headerShown: false }} />
+          <Stack.Screen name="ChatConversation" options={{ headerShown: false }} />
+          <Stack.Screen name="TestButton" options={{ headerShown: false }} />
+          <Stack.Screen name="Clue" />
+          <Stack.Screen name="StreetView" />
+          <Stack.Screen name="EventDetails" />
+          <Stack.Screen name="PaymentResult" />
+          <Stack.Screen 
+            name="payment-callback" 
+            options={{ 
+              headerShown: false,
+              title: 'Payment Processing'
+            }} 
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </SafeAreaProvider>
     </Provider>
   )
 }

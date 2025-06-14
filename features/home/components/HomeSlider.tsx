@@ -31,8 +31,11 @@ const ImageSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handleScroll = (event: any) => {
-    const slideIndex = Math.round(event.nativeEvent.contentOffset.x / width)
-    setCurrentIndex(slideIndex)
+    const offsetX = event.nativeEvent.contentOffset.x
+    const slideIndex = Math.round(offsetX / width)
+    if (slideIndex >= 0 && slideIndex < slides.length) {
+      setCurrentIndex(slideIndex)
+    }
   }
 
   const goToSlide = (index: number) => {
@@ -49,6 +52,10 @@ const ImageSlider = () => {
         onScroll={handleScroll}
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
+        decelerationRate="fast"
+        bounces={false}
+        snapToInterval={width}
+        snapToAlignment="start"
       >
         {slides.map((image, index) => (
           <Image
@@ -77,11 +84,13 @@ const ImageSlider = () => {
 const styles = StyleSheet.create({
   container: {
     height: 250,
-    marginBottom: 20
+    marginBottom: 20,
+    overflow: 'hidden'
   },
   image: {
     width: width,
-    height: 250
+    height: 250,
+    borderRadius: 0
   },
   dotsContainer: {
     flexDirection: 'row',
@@ -93,12 +102,12 @@ const styles = StyleSheet.create({
   dot: {
     height: 10,
     width: 10,
-    backgroundColor: '#bbb',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     margin: 6,
     borderRadius: 5
   },
   activeDot: {
-    backgroundColor: '#333'
+    backgroundColor: '#fff'
   }
 })
 
