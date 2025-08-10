@@ -131,7 +131,7 @@ const Payment = () => {
       // Add fallback URLs for better compatibility
       // formData.append('FallbackUrl', WEB_FALLBACK_URL);
       // formData.append('UniversalLink', UNIVERSAL_LINK);
-      formData.append('Method', '2');
+      formData.append('Method', '3');
       // formData.append('Platform', Platform.OS);
 
       const response = await createPayment(formData).unwrap();
