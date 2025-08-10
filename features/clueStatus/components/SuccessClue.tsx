@@ -11,7 +11,6 @@ import Animated, {
   Easing,
   withDelay
 } from 'react-native-reanimated';
-import { Canvas, Circle, Rect } from '@shopify/react-native-skia';
 import { StatusBar } from 'expo-status-bar';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -24,6 +23,7 @@ interface Particle {
   color: string;
   speedX: number;
   speedY: number;
+  opacity: number;
 }
 
 // Define confetti piece interface
@@ -37,6 +37,44 @@ interface ConfettiPiece {
   speedX: number;
   speedRotation: number;
 }
+
+// Animated particle component
+const AnimatedParticle: React.FC<{ particle: Particle }> = ({ particle }) => {
+  return (
+    <Animated.View
+      style={[
+        styles.particle,
+        {
+          left: particle.x,
+          top: particle.y,
+          width: particle.radius * 2,
+          height: particle.radius * 2,
+          backgroundColor: particle.color,
+          opacity: particle.opacity,
+        }
+      ]}
+    />
+  );
+};
+
+// Animated confetti component
+const AnimatedConfetti: React.FC<{ confetti: ConfettiPiece }> = ({ confetti }) => {
+  return (
+    <Animated.View
+      style={[
+        styles.confetti,
+        {
+          left: confetti.x,
+          top: confetti.y,
+          width: confetti.size,
+          height: confetti.size,
+          backgroundColor: confetti.color,
+          transform: [{ rotate: `${confetti.rotation}deg` }],
+        }
+      ]}
+    />
+  );
+};
 
 export default function SuccessClue() {
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -89,11 +127,12 @@ export default function SuccessClue() {
         x: Math.random() * SCREEN_WIDTH,
         y: Math.random() * SCREEN_HEIGHT,
         radius: Math.random() * 3 + 1,
-        color: `rgba(${Math.floor(Math.random() * 50) + 100}, 255, ${
+        color: `rgb(${Math.floor(Math.random() * 50) + 100}, 255, ${
           Math.floor(Math.random() * 100) + 150
-        }, ${Math.random() * 0.3 + 0.1})`,
+        })`,
         speedX: Math.random() * 1 - 0.5,
         speedY: Math.random() * 1 - 0.5,
+        opacity: Math.random() * 0.3 + 0.1,
       });
     }
     
@@ -133,15 +172,17 @@ export default function SuccessClue() {
     let animationFrameId: number;
 
     const updateParticles = () => {
-      const updatedParticles = [...particles];
-      updatedParticles.forEach((p, i) => {
-        updatedParticles[i].x += p.speedX;
-        updatedParticles[i].y += p.speedY;
-        // Bounce off edges
-        if (p.x < 0 || p.x > SCREEN_WIDTH) updatedParticles[i].speedX *= -1;
-        if (p.y < 0 || p.y > SCREEN_HEIGHT) updatedParticles[i].speedY *= -1;
+      setParticles(prevParticles => {
+        const updatedParticles = [...prevParticles];
+        updatedParticles.forEach((p, i) => {
+          updatedParticles[i].x += p.speedX;
+          updatedParticles[i].y += p.speedY;
+          // Bounce off edges
+          if (p.x < 0 || p.x > SCREEN_WIDTH) updatedParticles[i].speedX *= -1;
+          if (p.y < 0 || p.y > SCREEN_HEIGHT) updatedParticles[i].speedY *= -1;
+        });
+        return updatedParticles;
       });
-      setParticles(updatedParticles);
       animationFrameId = requestAnimationFrame(updateParticles);
     };
 
@@ -149,25 +190,27 @@ export default function SuccessClue() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [particles]);
+  }, []);
   
   // Animation loop for confetti
   useEffect(() => {
     let animationFrameId: number;
 
     const updateConfetti = () => {
-      const updatedConfetti = [...confetti];
-      updatedConfetti.forEach((c, i) => {
-        updatedConfetti[i].y += c.speedY;
-        updatedConfetti[i].x += c.speedX;
-        updatedConfetti[i].rotation += c.speedRotation;
-        // Reset confetti when it goes off screen
-        if (c.y > SCREEN_HEIGHT) {
-          updatedConfetti[i].y = -20;
-          updatedConfetti[i].x = Math.random() * SCREEN_WIDTH;
-        }
+      setConfetti(prevConfetti => {
+        const updatedConfetti = [...prevConfetti];
+        updatedConfetti.forEach((c, i) => {
+          updatedConfetti[i].y += c.speedY;
+          updatedConfetti[i].x += c.speedX;
+          updatedConfetti[i].rotation += c.speedRotation;
+          // Reset confetti when it goes off screen
+          if (c.y > SCREEN_HEIGHT) {
+            updatedConfetti[i].y = -20;
+            updatedConfetti[i].x = Math.random() * SCREEN_WIDTH;
+          }
+        });
+        return updatedConfetti;
       });
-      setConfetti(updatedConfetti);
       animationFrameId = requestAnimationFrame(updateConfetti);
     };
 
@@ -175,7 +218,7 @@ export default function SuccessClue() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [confetti]);
+  }, []);
 
   // Animated styles
   const containerStyle = useAnimatedStyle(() => ({
@@ -217,32 +260,18 @@ export default function SuccessClue() {
       <StatusBar style="light" />
       
       {/* Particle background */}
-      <Canvas style={StyleSheet.absoluteFill}>
+      <View style={StyleSheet.absoluteFill}>
         {particles.map((p, idx) => (
-          <Circle
-            key={idx}
-            cx={p.x}
-            cy={p.y}
-            r={p.radius}
-            color={p.color}
-          />
+          <AnimatedParticle key={`particle-${idx}`} particle={p} />
         ))}
-      </Canvas>
+      </View>
       
       {/* Confetti overlay */}
-      <Canvas style={[StyleSheet.absoluteFill, { zIndex: 10 }]}> 
+      <View style={[StyleSheet.absoluteFill, { zIndex: 10 }]}> 
         {confetti.map((c, idx) => (
-          <Rect
-            key={idx}
-            x={c.x - c.size / 2}
-            y={c.y - c.size / 2}
-            width={c.size}
-            height={c.size}
-            color={c.color}
-            transform={[{ rotate: (c.rotation * Math.PI) / 180 }]}
-          />
+          <AnimatedConfetti key={`confetti-${idx}`} confetti={c} />
         ))}
-      </Canvas>
+      </View>
       
       {/* Glowing accent */}
       <View className="absolute top-1/4 left-1/2 w-64 h-64 rounded-full bg-green-500 opacity-20" 
@@ -353,4 +382,14 @@ export default function SuccessClue() {
       </Animated.View>
     </View>
   );
-};
+}
+
+const styles = StyleSheet.create({
+  particle: {
+    position: 'absolute',
+    borderRadius: 50,
+  },
+  confetti: {
+    position: 'absolute',
+  },
+});

@@ -3,7 +3,6 @@ import { baseQueryWithErrorHandling } from '@/lib/baseApi'
 import { ResponseData } from '@/utils'
 import { createApi } from '@reduxjs/toolkit/query/react'
 
-console.trace('useGetTop3UserByCityIdQuery called')
 export const userProgressApi = createApi({
   reducerPath: 'userProgressApi',
   baseQuery: baseQueryWithErrorHandling,
