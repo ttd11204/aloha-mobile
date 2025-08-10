@@ -33,24 +33,10 @@ export default function ChatConversation() {
 
   const [userId, setUserId] = useState<string | null>(null)
   const [messageText, setMessageText] = useState('')
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([])
   const scrollViewRef = useRef<ScrollView>(null)
 
-  // Debug log for button state (only when text changes)
-  React.useEffect(() => {
-    console.log('Message text changed:', messageText, 'Has text:', !!messageText.trim())
-  }, [messageText])
-
-  const { data: chatMessages = [], isLoading: loadingMessages, refetch } = useGetChatMessagesQuery({
-    page: 1,
-    pageSize: 50,
-    chatRoomId: params.chatRoomId
-  }, {
-    skip: !params.chatRoomId
-  })
-
-  const [sendMessage, { isLoading: sendingMessage }] = useSendMessageMutation()
-
+  // Get user ID from token
   useEffect(() => {
     const getUserId = async () => {
       try {
@@ -66,79 +52,106 @@ export default function ChatConversation() {
     getUserId()
   }, [])
 
-  useEffect(() => {
-    setMessages(chatMessages)
-  }, [chatMessages])
+  // Load chat messages from API
+  const { 
+    data: apiMessages = [], 
+    isLoading: loadingMessages, 
+    error: messagesError,
+    refetch 
+  } = useGetChatMessagesQuery({
+    page: 1,
+    pageSize: 30,
+    chatRoomId: params.chatRoomId
+  }, {
+    skip: !params.chatRoomId
+  })
 
+  // Send message mutation
+  const [sendMessage, { isLoading: sendingMessage }] = useSendMessageMutation()
+
+  // Update local messages when API data changes
   useEffect(() => {
-    // Auto scroll to bottom when new messages arrive
+    if (apiMessages && apiMessages.length > 0) {
+      console.log('📥 Loaded messages from API:', apiMessages.length)
+      // Sort messages by sentAt to ensure correct order (oldest first)
+      const sortedMessages = [...apiMessages].sort((a, b) => 
+        new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+      )
+      setLocalMessages(sortedMessages)
+    }
+  }, [apiMessages])
+
+  // Auto scroll to bottom when messages change
+  useEffect(() => {
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true })
     }, 100)
-  }, [messages])
+  }, [localMessages])
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !userId || !params.chatRoomId) {
-      console.log('Cannot send message - missing data:', {
-        hasMessage: !!messageText.trim(),
+    const trimmedMessage = messageText.trim()
+    
+    if (!trimmedMessage || !userId || !params.chatRoomId) {
+      console.log('Cannot send message:', {
+        hasMessage: !!trimmedMessage,
         hasUserId: !!userId,
         hasChatRoomId: !!params.chatRoomId
       })
       return
     }
 
-    console.log('=== SENDING MESSAGE ===')
-    console.log('Message text:', messageText.trim())
-    console.log('User ID:', userId)
-    console.log('Chat Room ID:', params.chatRoomId)
-
+    // Create optimistic message
     const tempMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `temp-${Date.now()}`,
       senderId: userId,
       senderFullname: 'You',
       senderAvatarUrl: '',
-      content: messageText.trim(),
+      content: trimmedMessage,
       sentAt: new Date().toISOString(),
       isRead: false,
       messageType: 'text'
     }
 
-    // Optimistically add message
-    setMessages(prev => [...prev, tempMessage])
-    const originalMessage = messageText.trim()
+    // Add optimistic message to UI
+    setLocalMessages(prev => [...prev, tempMessage])
     setMessageText('')
 
     try {
-      const requestData = {
+      console.log('📤 Sending message:', trimmedMessage)
+      
+      const response = await sendMessage({
         userId: userId,
         chatRoomId: params.chatRoomId,
-        content: originalMessage,
+        content: trimmedMessage,
         messageType: 'text'
-      }
-      
-      console.log('API Request data:', requestData)
-      
-      const response = await sendMessage(requestData).unwrap()
-      
-      console.log('API Response:', response)
+      }).unwrap()
 
-      // Replace temp message with actual response
-      setMessages(prev => prev.map(msg => 
-        msg.id === tempMessage.id ? response : msg
-      ))
+      console.log('✅ Message sent successfully:', response)
+
+             // Replace temp message with real response
+       setLocalMessages(prev => 
+         prev.map(msg => 
+           msg.id === tempMessage.id ? response : msg
+         )
+       )
+
+       // Optional: Refresh messages from server after a short delay
+       // This ensures we have the latest state from server but doesn't disrupt UI order
+       setTimeout(() => {
+         refetch()
+       }, 500)
       
-      // Refresh messages from server
-      refetch()
     } catch (error: any) {
-      console.error('=== SEND MESSAGE ERROR ===')
-      console.error('Full error:', error)
-      console.error('Error status:', error.status)
-      console.error('Error data:', error.data)
-      
+      console.error('❌ Send message error:', error)
       Alert.alert('Error', 'Failed to send message. Please try again.')
       
       // Remove temp message on error
-      setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id))
+      setLocalMessages(prev => 
+        prev.filter(msg => msg.id !== tempMessage.id)
+      )
+      
+      // Restore message text
+      setMessageText(trimmedMessage)
     }
   }
 
@@ -155,8 +168,7 @@ export default function ChatConversation() {
 
   const renderMessage = (message: ChatMessage, index: number) => {
     const isMyMessage = message.senderId === userId
-    const isLastMessage = index === messages.length - 1
-
+    
     return (
       <View
         key={message.id}
@@ -191,7 +203,14 @@ export default function ChatConversation() {
         style={{ paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight || 24 + 20 }}
       >
         <View className="flex-row items-center px-4">
-          <TouchableOpacity onPress={() => router.back()} className="mr-3">
+          <TouchableOpacity 
+            onPress={() => {
+              console.log('🔙 Back button pressed')
+              router.back()
+            }} 
+            className="mr-3 p-2"
+            activeOpacity={0.7}
+          >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           
@@ -201,17 +220,12 @@ export default function ChatConversation() {
           
           <View className="flex-1">
             <Text className="text-white text-lg font-semibold" numberOfLines={1}>
-              {params.friendEmail || params.chatRoomName || 'Unknown User'}
+              {params.friendEmail || params.chatRoomName || 'Chat'}
+            </Text>
+            <Text className="text-white/80 text-sm">
+              Room: {params.chatRoomId?.substring(0, 8)}...
             </Text>
           </View>
-          
-          <TouchableOpacity className="p-2">
-            <Ionicons name="call" size={22} color="white" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity className="p-2 ml-2">
-            <Ionicons name="videocam" size={22} color="white" />
-          </TouchableOpacity>
         </View>
       </LinearGradient>
 
@@ -226,8 +240,20 @@ export default function ChatConversation() {
             <ActivityIndicator size="large" color="#0095ff" />
             <Text className="text-gray-500 mt-2">Loading messages...</Text>
           </View>
-        ) : messages.length > 0 ? (
-          messages.map((message, index) => renderMessage(message, index))
+        ) : messagesError ? (
+          <View className="flex-1 justify-center items-center py-20">
+            <Ionicons name="alert-circle" size={64} color="#ef4444" />
+            <Text className="text-red-500 text-lg mt-4">Error loading messages</Text>
+            <TouchableOpacity 
+              onPress={() => refetch()}
+              className="mt-4 px-6 py-3 bg-blue-500 rounded-lg"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white font-medium">Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : localMessages.length > 0 ? (
+          localMessages.map((message, index) => renderMessage(message, index))
         ) : (
           <View className="flex-1 justify-center items-center py-20">
             <Ionicons name="chatbubbles-outline" size={64} color="#d1d5db" />
@@ -251,50 +277,31 @@ export default function ChatConversation() {
               placeholder="Type a message..."
               placeholderTextColor="#9ca3af"
               value={messageText}
-              onChangeText={(text) => {
-                console.log('Text input changed:', text)
-                setMessageText(text)
-              }}
+              onChangeText={setMessageText}
               multiline
               textAlignVertical="center"
+              editable={!sendingMessage}
             />
-            <TouchableOpacity className="ml-2">
-              <Ionicons name="attach" size={20} color="#6b7280" />
-            </TouchableOpacity>
-          </View>
-          
-          {/* Debug info */}
-          <View style={{ marginRight: 8 }}>
-            <Text style={{ fontSize: 10, color: 'red' }}>
-              {messageText.length}
-            </Text>
           </View>
           
           <TouchableOpacity 
             onPress={() => {
-              console.log('Send button pressed!')
-              console.log('messageText:', messageText)
-              console.log('messageText length:', messageText.length)
-              console.log('canSend:', !!messageText.trim())
+              console.log('📤 Send button pressed, message:', messageText)
               handleSendMessage()
             }}
             disabled={!messageText.trim() || sendingMessage}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: messageText.trim() && !sendingMessage ? '#3b82f6' : '#9ca3af',
-              borderWidth: 2,
-              borderColor: messageText.trim() ? '#ef4444' : '#10b981'
-            }}
+            className={`w-12 h-12 rounded-full items-center justify-center ${
+              messageText.trim() && !sendingMessage 
+                ? 'bg-blue-500' 
+                : 'bg-gray-300'
+            }`}
+            activeOpacity={0.8}
           >
             {sendingMessage ? (
               <ActivityIndicator size="small" color="white" />
             ) : (
               <Ionicons 
-                name={messageText.trim() ? "send" : "send-outline"}
+                name="send"
                 size={18} 
                 color="white" 
               />

@@ -289,82 +289,76 @@ export default function ChatScreen() {
     console.log('Current userId:', userId)
     console.log('Target friendUserId:', friendUserId)
     console.log('Friend name:', friendName)
-    console.log('Available chat rooms:', chatRooms)
 
     if (!userId) {
-      console.log('ERROR: No userId found')
+      console.log('❌ ERROR: No userId found')
+      showToast('Bạn cần đăng nhập để chat', 'error')
+      return
+    }
+
+    if (!friendUserId) {
+      console.log('❌ ERROR: No friendUserId provided')
+      showToast('Không tìm thấy thông tin bạn bè', 'error')
       return
     }
 
     try {
-      // Check if chat room already exists
-      const existingRoom = chatRooms.find(room => 
-        !room.IsGroup && 
-        room.Name && 
-        friendName && 
-        room.Name.includes(friendName)
-      )
-
-      console.log('Existing room found:', existingRoom)
-
-      if (existingRoom) {
-        // Navigate to existing chat room
-        console.log('Using existing chat room:', existingRoom.Id)
-        router.push({
-          pathname: '/ChatConversation',
-          params: {
-            chatRoomId: existingRoom.Id,
-            chatRoomName: existingRoom.Name,
-            friendEmail: friendEmail || friendName,
-            friendId: friendUserId
-          }
-        } as any)
-        return
-      }
-
-      // Create new chat room
-      console.log('Creating new chat room...')
-      
-      if (!userId || !friendUserId) {
-        console.log('ERROR: Missing required IDs - userId:', userId, 'friendUserId:', friendUserId)
-        showToast('Missing user information', 'error')
-        return
-      }
+      console.log('🚀 Creating/Getting chat room...')
       
       const requestData = {
         userId: userId,
         targetUserId: friendUserId
       }
-      console.log('Create chat room request data:', requestData)
-      console.log('Expected endpoint: POST https://aloha-vietnam.azurewebsites.net/api/chat/room')
+      console.log('📤 POST /Chat/room request data:', requestData)
 
-      const newRoom = await createChatRoom(requestData).unwrap()
+      // Step 1: Call POST /Chat/room to create or get existing room
+      const roomResponse = await createChatRoom(requestData).unwrap()
       
-      console.log('Chat room created successfully:', newRoom)
-      // await refetchChatRooms() // Temporarily commented out
+      console.log('✅ Chat room response:', roomResponse)
+      console.log('Room ID:', roomResponse.id)
+      console.log('Room Name:', roomResponse.name)
+      console.log('Is Group:', roomResponse.isGroup)
+      console.log('Created At:', roomResponse.createdAt)
 
-      // Navigate to new chat room
+      // Step 2: Navigate to ChatConversation with the room ID
+      console.log('🧭 Navigating to ChatConversation with chatRoomId:', roomResponse.id)
+      
       router.push({
         pathname: '/ChatConversation',
         params: {
-          chatRoomId: newRoom.Id,
-          chatRoomName: newRoom.Name,
+          chatRoomId: roomResponse.id,
+          chatRoomName: roomResponse.name || friendName,
           friendEmail: friendEmail || friendName,
           friendId: friendUserId
         }
       } as any)
+
+      console.log('✅ Navigation completed')
+      
     } catch (error: any) {
-      console.log('=== CREATE CHAT ROOM ERROR ===')
+      console.log('=== ❌ CREATE CHAT ROOM ERROR ===')
       console.error('Full error object:', error)
       console.log('Error status:', error.status)
       console.log('Error data:', error.data)
       console.log('Error message:', error.message)
       
+      let errorMessage = 'Không thể tạo phòng chat'
+      
+      if (error.status === 401) {
+        errorMessage = 'Bạn cần đăng nhập lại'
+      } else if (error.status === 404) {
+        errorMessage = 'Không tìm thấy người dùng'
+      } else if (error.status === 400) {
+        errorMessage = 'Thông tin không hợp lệ'
+      } else if (error.data?.message) {
+        errorMessage = error.data.message
+      }
+      
       if (error.data) {
         console.log('Server response data:', JSON.stringify(error.data, null, 2))
       }
       
-      showToast('Failed to start chat', 'error')
+      showToast(errorMessage, 'error')
     }
   }
 
@@ -401,16 +395,16 @@ export default function ChatScreen() {
     // Add existing chat rooms
     if (Array.isArray(chatRooms)) {
       chatRooms.forEach(room => {
-        if (room && !room.IsGroup && room.Id && room.Name) {
+        if (room && !room.isGroup && room.id && room.name) {
           conversations.push({
-            id: room.Id,
-            name: room.Name || 'Chat Room',
+            id: room.id,
+            name: room.name || 'Chat Room',
             avatar: '💬',
             lastMessage: 'Continue conversation...',
-            timestamp: formatDate(room.CreatedAt || new Date().toISOString()),
+            timestamp: formatDate(room.createdAt || new Date().toISOString()),
             unread: 0,
             type: 'chatroom',
-            chatRoomId: room.Id
+            chatRoomId: room.id
           })
         }
       })
@@ -423,10 +417,10 @@ export default function ChatScreen() {
           const friendName = friend.friendFullname || friend.friendEmail || ''
           const hasExistingRoom = Array.isArray(chatRooms) && chatRooms.some(room => 
             room &&
-            !room.IsGroup && 
-            room.Name && 
+            !room.isGroup && 
+            room.name && 
             friendName && 
-            room.Name.includes(friendName)
+            room.name.includes(friendName)
           )
           
           if (!hasExistingRoom) {

@@ -38,10 +38,10 @@ export interface Friend {
 }
 
 export interface ChatRoom {
-  Id: string
-  Name: string
-  IsGroup: boolean
-  CreatedAt: string
+  id: string
+  name: string
+  isGroup: boolean
+  createdAt: string
 }
 
 export interface CreateChatRoomRequest {
@@ -118,7 +118,7 @@ export const chatApi = createApi({
     // Create chat room for 1-1 conversation
     createChatRoom: builder.mutation<ChatRoom, CreateChatRoomRequest>({
       query: (body) => ({
-        url: 'chat/room',
+        url: 'Chat/room',
         method: 'POST',
         body,
         headers: {
