@@ -59,7 +59,6 @@ const Leaderboard = () => {
   } = useGetTop3UserByCityIdQuery({ cityId: 1 })
 
   const userId = useAppSelector((state) => state.auth.userId)
-  console.log('Your userId:', userId)
 
   const queryArgs = userId ? { userId, cityId: 1 } : skipToken
 
@@ -68,7 +67,6 @@ const Leaderboard = () => {
     isLoading: userRankLoading,
     error: userRankError
   } = useGetUserRankInCityQuery(queryArgs)
-  console.log('22222222222:', userRank?.data?.userName)
 
   if (isLoading || !leaderboardData?.data?.length) {
     return (

@@ -1,10 +1,6 @@
-import ProfileComponent from '@/features/userProfile/components/UserProfile'
-import { View } from 'react-native'
+import UserProfile from "@/features/userProfile/components/UserProfile";
+import React from "react";
 
-export default function ProfileScreen() {
-  return (
-    <View className="flex-1">
-      <ProfileComponent />
-    </View>
-  )
-} 
+export default function UserProfileScreen() {
+  return <UserProfile />;
+}

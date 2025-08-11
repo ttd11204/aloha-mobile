@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Debug Android",
+      "program": "${workspaceFolder}",
+      "type": "reactnative",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "platform": "android",
+      "sourceMaps": true,
+      "trace": "verbose"
+    },
+    {
+      "name": "Attach to Packager",
+      "program": "${workspaceFolder}",
+      "type": "reactnative",
+      "request": "attach",
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "trace": "verbose"
+    }
+  ],
+  "react-native-tools": {
+    "projectRoot": "${workspaceFolder}"
+  }
+}
